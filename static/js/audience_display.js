@@ -406,8 +406,10 @@ const handleAllianceSelection = function (data) {
     let text = "";
     $.each(rankedTeams, function (i, v) {
       if (!v.Picked) {
-        text += `<div class="unpicked"><div class="unpicked-rank">${v.Rank}.</div>` +
-          `<div class="unpicked-team">${v.TeamId}</div></div>`;
+        text += `<div class="team-tile-display">` +
+          `<div class="team-rank-display">${v.Rank}</div>` +
+          `<div class="team-body-display">${v.TeamId}</div>` +
+          `</div>`;
       }
     });
     $("#allianceRankings").html(text);

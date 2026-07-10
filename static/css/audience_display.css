@@ -714,30 +714,53 @@ html {
   top: 3em;
 }
 #allianceRankings {
-  max-width: 11em;
+  max-width: 42em; /* Fits exactly 8 tiles per row */
   max-height: 92%;
   display: flex;
-  flex-flow: column wrap;
-  overflow: hidden;
-  background-color: #fff;
-  border: 2px solid #222;
-  font-size: 2em;
+  flex-flow: row wrap;
+  align-content: flex-start;
+  gap: 0.3em;
+  padding: 0.5em;
+  background-color: rgba(6, 35, 75, 0.8);
+  border: 3px solid #ffcd00;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   font-family: 'Arboto Bold', sans-serif;
   font-weight: 700;  /* bold */
+  font-size: 2em;
 }
-.unpicked {
-  width: 5.5em;
+.team-tile-display {
   display: flex;
-  justify-content: start;
+  flex-direction: row;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  height: 2em;
 }
-.unpicked-rank {
-  width: 1.8em;
-  text-align: right;
-  color: #999;
+.team-rank-display {
+  width: 2em;
+  background-color: #0dcaf0;
+  color: #111;
+  font-size: 0.85em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.unpicked-team {
-  margin-left: 0.3em;
-  color: #222;
+.team-tile-display:nth-child(-n+8) .team-rank-display {
+  background-color: #ffcd00;
+}
+.team-body-display {
+  width: 2.8em;
+  background-color: #00457f;
+  color: #fff;
+  font-size: 0.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 2px solid #0dcaf0;
+}
+.team-tile-display:nth-child(-n+8) .team-body-display {
+  border-left-color: #ffcd00;
 }
 #allianceSelectionCentering {
   position: absolute;
