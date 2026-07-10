@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -26,7 +27,8 @@ func TestConfigureSwitch(t *testing.T) {
 
 	// Modify to Fortinet's expected reset command
 	expectedResetCommand := "admin\npassword\nconfig system console\nset output standard\nend\n" +
-		"config system dhcp server\ndelete 10\ndelete 20\ndelete 30\ndelete 40\ndelete 50\ndelete 60\nend\nexit\n"
+		"config system dhcp server\ndelete 10\ndelete 20\ndelete 30\ndelete 40\ndelete 50\ndelete 60\nend\n" +
+		"config system interface\ndelete \"vlan10\"\ndelete \"vlan20\"\ndelete \"vlan30\"\ndelete \"vlan40\"\ndelete \"vlan50\"\ndelete \"vlan60\"\nend\nexit\n"
 
 	// 1. Test: When there are no teams, only VLAN removal should be executed
 	mockTelnet(t, sw.port, &command1, &command2)
@@ -43,7 +45,7 @@ func TestConfigureSwitch(t *testing.T) {
 	assert.Equal(
 		t,
 		"admin\npassword\nconfig system console\nset output standard\nend\n"+
-			"config system interface\nedit \"vlan50\"\nset ip 10.2.54.4 255.255.255.0\nnext\nend\n"+
+			"config system interface\nedit \"vlan50\"\nset vlanid 50\nset interface \"internal\"\nset ip 10.2.54.4 255.255.255.0\nnext\nend\n"+
 			"config system dhcp server\nedit 50\nset interface \"vlan50\"\nset default-gateway 10.2.54.4\nset netmask 255.255.255.0\n"+
 			"config ip-range\nedit 1\nset start-ip 10.2.54.20\nset end-ip 10.2.54.199\nnext\nend\nnext\nend\nexit\n",
 		command2,
@@ -78,20 +80,20 @@ func mockTelnet(t *testing.T, port int, command1 *string, command2 *string) {
 		// Simulate first connection (Reset)
 		conn1, err := ln.Accept()
 		if err == nil {
-			conn1.SetReadDeadline(time.Now().Add(50 * time.Millisecond))
+			conn1.SetReadDeadline(time.Now().Add(20 * time.Second))
 			var reader bytes.Buffer
 			reader.ReadFrom(conn1)
-			*command1 = reader.String()
+			*command1 = strings.ReplaceAll(reader.String(), "\r", "\n")
 			conn1.Close()
 		}
 
 		// Simulate second connection (Config)
 		conn2, err := ln.Accept()
 		if err == nil {
-			conn2.SetReadDeadline(time.Now().Add(50 * time.Millisecond))
+			conn2.SetReadDeadline(time.Now().Add(20 * time.Second))
 			var reader bytes.Buffer
 			reader.ReadFrom(conn2)
-			*command2 = reader.String()
+			*command2 = strings.ReplaceAll(reader.String(), "\r", "\n")
 			conn2.Close()
 		}
 	}()

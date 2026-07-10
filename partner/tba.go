@@ -54,6 +54,27 @@ type TbaAlliance struct {
 	Score      *int     `json:"score"`
 }
 
+type TbaHubScore struct {
+	AutoCount        int `mapstructure:"autoCount"`
+	AutoPoints       int `mapstructure:"autoPoints"`
+	EndgameCount     int `mapstructure:"endgameCount"`
+	EndgamePoints    int `mapstructure:"endgamePoints"`
+	Shift1Count      int `mapstructure:"shift1Count"`
+	Shift1Points     int `mapstructure:"shift1Points"`
+	Shift2Count      int `mapstructure:"shift2Count"`
+	Shift2Points     int `mapstructure:"shift2Points"`
+	Shift3Count      int `mapstructure:"shift3Count"`
+	Shift3Points     int `mapstructure:"shift3Points"`
+	Shift4Count      int `mapstructure:"shift4Count"`
+	Shift4Points     int `mapstructure:"shift4Points"`
+	TeleopCount      int `mapstructure:"teleopCount"`
+	TeleopPoints     int `mapstructure:"teleopPoints"`
+	TotalCount       int `mapstructure:"totalCount"`
+	TotalPoints      int `mapstructure:"totalPoints"`
+	TransitionCount  int `mapstructure:"transitionCount"`
+	TransitionPoints int `mapstructure:"transitionPoints"`
+}
+
 // 2026 REBUILT Score Breakdown Structure
 type TbaScoreBreakdown struct {
 	// Auto
@@ -90,15 +111,18 @@ type TbaScoreBreakdown struct {
 	SuperchargedRankingPoint bool `mapstructure:"superchargedRankingPoint"`
 	TraversalRankingPoint    bool `mapstructure:"traversalRankingPoint"`
 	RP                       int  `mapstructure:"rp"`
+
+	// 2026 Hub Score Object
+	HubScore TbaHubScore `mapstructure:"hubScore"`
 }
 
 type TbaRanking struct {
 	TeamKey string  `json:"team_key"`
 	Rank    int     `json:"rank"`
-	RP      float32 `json:"rp"`
-	Match   float32 `json:"match"` // Avg Match Points
-	Auto    float32 `json:"auto"`  // Avg Auto Points
-	Tower   float32 `json:"tower"` // Avg Tower Points (Replaces Barge)
+	RP      float32 `json:"RP"`
+	Match   float32 `json:"Match"` // Avg Match Points
+	Auto    float32 `json:"Auto"`  // Avg Auto Points
+	Tower   float32 `json:"Tower"` // Avg Tower Points (Replaces Barge)
 	Wins    int     `json:"wins"`
 	Losses  int     `json:"losses"`
 	Ties    int     `json:"ties"`
@@ -149,11 +173,12 @@ type TbaPublishedAward struct {
 }
 
 // 2026 Mappings
-var autoTowerMapping = map[bool]string{false: "No", true: "Yes"}
+var autoTowerMapping = map[bool]string{false: "None", true: "Level1"}
 var endGameStatusMapping = map[game.EndgameStatus]string{
 	game.EndgameNone:   "None",
-	game.EndgameLevel2: "Level 2", // Low Rung
-	game.EndgameLevel3: "Level 3", // Mid Rung
+	game.EndgameLevel1: "Level1",
+	game.EndgameLevel2: "Level2",
+	game.EndgameLevel3: "Level3",
 }
 
 func NewTbaClient(eventCode, secretId, secret string) *TbaClient {
@@ -639,6 +664,26 @@ func createTbaScoringBreakdown(
 	breakdown.TotalFuelPoints = scoreSummary.TotalFuelPoints
 	breakdown.TotalTowerPoints = scoreSummary.TotalTowerPoints
 	breakdown.TotalPoints = scoreSummary.Score
+
+	// 2026 Hub Score Details
+	breakdown.HubScore.AutoCount = score.AutoFuelCount
+	breakdown.HubScore.AutoPoints = scoreSummary.AutoFuelPoints
+	breakdown.HubScore.EndgameCount = score.EndgameFuelCount
+	breakdown.HubScore.EndgamePoints = score.EndgameFuelCount * 1
+	breakdown.HubScore.Shift1Count = score.Shift1FuelCount
+	breakdown.HubScore.Shift1Points = score.Shift1FuelCount * 1
+	breakdown.HubScore.Shift2Count = score.Shift2FuelCount
+	breakdown.HubScore.Shift2Points = score.Shift2FuelCount * 1
+	breakdown.HubScore.Shift3Count = score.Shift3FuelCount
+	breakdown.HubScore.Shift3Points = score.Shift3FuelCount * 1
+	breakdown.HubScore.Shift4Count = score.Shift4FuelCount
+	breakdown.HubScore.Shift4Points = score.Shift4FuelCount * 1
+	breakdown.HubScore.TransitionCount = score.TransitionFuelCount
+	breakdown.HubScore.TransitionPoints = score.TransitionFuelCount * 1
+	breakdown.HubScore.TeleopCount = score.TeleopFuelCount
+	breakdown.HubScore.TeleopPoints = scoreSummary.TeleopFuelPoints
+	breakdown.HubScore.TotalCount = score.AutoFuelCount + score.TeleopFuelCount
+	breakdown.HubScore.TotalPoints = scoreSummary.TotalFuelPoints
 
 	// Fouls
 	for _, foul := range score.Fouls {

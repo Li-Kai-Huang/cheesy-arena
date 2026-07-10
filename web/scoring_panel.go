@@ -205,6 +205,22 @@ func (web *Web) scoringPanelWebsocketHandler(w http.ResponseWriter, r *http.Requ
 				score.AutoFuelCount = max(0, score.AutoFuelCount+args.Adjustment)
 			} else {
 				score.TeleopFuelCount = max(0, score.TeleopFuelCount+args.Adjustment)
+				timeVal := int(web.arena.MatchTimeSec())
+				if web.arena.MatchState == field.TeleopPeriod {
+					if timeVal > 0 && timeVal < 33 {
+						score.TransitionFuelCount = max(0, score.TransitionFuelCount+args.Adjustment)
+					} else if timeVal < 58 {
+						score.Shift1FuelCount = max(0, score.Shift1FuelCount+args.Adjustment)
+					} else if timeVal < 83 {
+						score.Shift2FuelCount = max(0, score.Shift2FuelCount+args.Adjustment)
+					} else if timeVal < 108 {
+						score.Shift3FuelCount = max(0, score.Shift3FuelCount+args.Adjustment)
+					} else if timeVal < 133 {
+						score.Shift4FuelCount = max(0, score.Shift4FuelCount+args.Adjustment)
+					} else {
+						score.EndgameFuelCount = max(0, score.EndgameFuelCount+args.Adjustment)
+					}
+				}
 			}
 			scoreChanged = true
 
@@ -286,8 +302,6 @@ func (web *Web) scoringPanelWebsocketHandler(w http.ResponseWriter, r *http.Requ
 				web.arena.BlueRealtimeScore.CurrentScore.Fouls =
 					append(web.arena.BlueRealtimeScore.CurrentScore.Fouls, foul)
 			}
-			web.arena.RedRealtimeScore.FoulsCommitted = true
-			web.arena.BlueRealtimeScore.FoulsCommitted = true
 			web.arena.RealtimeScoreNotifier.Notify()
 		}
 

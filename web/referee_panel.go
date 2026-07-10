@@ -131,8 +131,6 @@ func (web *Web) refereePanelWebsocketHandler(w http.ResponseWriter, r *http.Requ
 					append(web.arena.BlueRealtimeScore.CurrentScore.Fouls, foul)
 			}
 
-			web.arena.RedRealtimeScore.FoulsCommitted = true
-			web.arena.BlueRealtimeScore.FoulsCommitted = true
 			web.arena.RealtimeScoreNotifier.Notify()
 
 		} else if command == "deleteFoul" || command == "toggleFoulType" || command == "updateFoulTeam" || command == "updateFoulRule" {

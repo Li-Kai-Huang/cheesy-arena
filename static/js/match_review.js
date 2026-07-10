@@ -28,9 +28,15 @@ const renderResults = function (alliance) {
   const scoreContent = scoreTemplate(result);
   $(`#${alliance}Score`).html(scoreContent);
 
-  // 1. Fuel 數量 (Auto/Teleop)
+  // 1. Fuel 數量 (Auto/Teleop/Shifts)
   getInputElement(alliance, "AutoFuelCount").val(result.score.AutoFuelCount || 0);
   getInputElement(alliance, "TeleopFuelCount").val(result.score.TeleopFuelCount || 0);
+  getInputElement(alliance, "Shift1FuelCount").val(result.score.Shift1FuelCount || 0);
+  getInputElement(alliance, "Shift2FuelCount").val(result.score.Shift2FuelCount || 0);
+  getInputElement(alliance, "Shift3FuelCount").val(result.score.Shift3FuelCount || 0);
+  getInputElement(alliance, "Shift4FuelCount").val(result.score.Shift4FuelCount || 0);
+  getInputElement(alliance, "TransitionFuelCount").val(result.score.TransitionFuelCount || 0);
+  getInputElement(alliance, "EndgameFuelCount").val(result.score.EndgameFuelCount || 0);
 
   // 2. 處理 3 個隊伍的狀態
   // 注意：result.score 陣列索引為 0, 1, 2；但 HTML 欄位名稱使用 1, 2, 3 (對應 Payload)
@@ -91,6 +97,12 @@ const updateResults = function (alliance) {
   // 讀取 Fuel Count
   result.score.AutoFuelCount = parseInt(formData[`${alliance}AutoFuelCount`]) || 0;
   result.score.TeleopFuelCount = parseInt(formData[`${alliance}TeleopFuelCount`]) || 0;
+  result.score.Shift1FuelCount = parseInt(formData[`${alliance}Shift1FuelCount`]) || 0;
+  result.score.Shift2FuelCount = parseInt(formData[`${alliance}Shift2FuelCount`]) || 0;
+  result.score.Shift3FuelCount = parseInt(formData[`${alliance}Shift3FuelCount`]) || 0;
+  result.score.Shift4FuelCount = parseInt(formData[`${alliance}Shift4FuelCount`]) || 0;
+  result.score.TransitionFuelCount = parseInt(formData[`${alliance}TransitionFuelCount`]) || 0;
+  result.score.EndgameFuelCount = parseInt(formData[`${alliance}EndgameFuelCount`]) || 0;
 
   for (let i = 0; i < 3; i++) {
     const htmlIdx = i + 1; // 根據 Payload，HTML 名稱為 redRobotsBypassed1...3
@@ -145,3 +157,15 @@ const getInputElement = function (alliance, name, value) {
 const getSelectElement = function (alliance, name) {
   return $(`select[name=${alliance}${name}]`);
 };
+
+// 自動加總各 Shift 的燃料球數量到 Teleop 欄位
+$(document).on("input", ".shift-fuel", function() {
+  const alliance = $(this).data("alliance");
+  const s1 = parseInt(getInputElement(alliance, "Shift1FuelCount").val()) || 0;
+  const s2 = parseInt(getInputElement(alliance, "Shift2FuelCount").val()) || 0;
+  const s3 = parseInt(getInputElement(alliance, "Shift3FuelCount").val()) || 0;
+  const s4 = parseInt(getInputElement(alliance, "Shift4FuelCount").val()) || 0;
+  const tr = parseInt(getInputElement(alliance, "TransitionFuelCount").val()) || 0;
+  const eg = parseInt(getInputElement(alliance, "EndgameFuelCount").val()) || 0;
+  getInputElement(alliance, "TeleopFuelCount").val(s1 + s2 + s3 + s4 + tr + eg);
+});

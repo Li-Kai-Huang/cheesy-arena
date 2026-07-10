@@ -59,17 +59,20 @@ func TestScoringPanelWebsocket(t *testing.T) {
 	defer blueConn.Close()
 	blueWs := websocket.NewTestWebsocket(blueConn)
 
+	// 2. 接收初始狀態更新 (Handshake)
+	readWebsocketType(t, redWs, "resetLocalState")
+	readWebsocketType(t, blueWs, "resetLocalState")
+
 	assert.Equal(t, 1, web.arena.ScoringPanelRegistry.GetNumPanels("red_near"))
 	assert.Equal(t, 1, web.arena.ScoringPanelRegistry.GetNumPanels("blue_near"))
 
-	// 2. 接收初始狀態更新 (Handshake)
-	readWebsocketType(t, redWs, "resetLocalState")
 	readWebsocketType(t, redWs, "matchLoad")
 	readWebsocketType(t, redWs, "matchTime")
+	readWebsocketType(t, redWs, "matchTiming")
 	readWebsocketType(t, redWs, "realtimeScore")
-	readWebsocketType(t, blueWs, "resetLocalState")
 	readWebsocketType(t, blueWs, "matchLoad")
 	readWebsocketType(t, blueWs, "matchTime")
+	readWebsocketType(t, blueWs, "matchTiming")
 	readWebsocketType(t, blueWs, "realtimeScore")
 
 	// --- 2026 測試開始: Auto Period ---
@@ -128,6 +131,8 @@ func TestScoringPanelWebsocket(t *testing.T) {
 
 	// --- 2026 測試開始: Teleop Period ---
 	web.arena.MatchState = field.TeleopPeriod
+	web.arena.RedRealtimeScore.CurrentScore.HubActive = true
+	web.arena.BlueRealtimeScore.CurrentScore.HubActive = true
 
 	// 5. 測試 Fuel (Teleop)
 	fuelData.Autonomous = false

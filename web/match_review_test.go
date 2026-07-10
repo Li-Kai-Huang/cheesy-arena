@@ -29,6 +29,8 @@ func TestMatchReview(t *testing.T) {
 func TestMatchReviewEditExistingResult(t *testing.T) {
 	web := setupTestWeb(t)
 	tournament.CreateTestAlliances(web.arena.Database, 8)
+	web.arena.EventSettings.PlayoffType = model.SingleEliminationPlayoff
+	web.arena.EventSettings.NumPlayoffAlliances = 8
 	web.arena.CreatePlayoffTournament()
 	web.arena.CreatePlayoffMatches(time.Now())
 

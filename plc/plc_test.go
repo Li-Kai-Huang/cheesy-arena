@@ -65,21 +65,43 @@ func TestPlcGetNames(t *testing.T) {
 		t,
 		[]string{
 			"fieldEStop",
+			"input(1)",
+			"input(2)",
+			"input(3)",
+			"input(4)",
+			"input(5)",
+			"input(6)",
+			"input(7)",
+			"input(8)",
+			"input(9)",
+			"input(10)",
+			"input(11)",
+			"input(12)",
+			"input(13)",
+			"input(14)",
+			"input(15)",
 			"red1EStop",
 			"red1AStop",
 			"red2EStop",
 			"red2AStop",
 			"red3EStop",
 			"red3AStop",
+			"redConnected1",
+			"redConnected2",
+			"redConnected3",
+			"input(25)",
+			"input(26)",
+			"input(27)",
+			"input(28)",
+			"input(29)",
+			"input(30)",
+			"input(31)",
 			"blue1EStop",
 			"blue1AStop",
 			"blue2EStop",
 			"blue2AStop",
 			"blue3EStop",
 			"blue3AStop",
-			"redConnected1",
-			"redConnected2",
-			"redConnected3",
 			"blueConnected1",
 			"blueConnected2",
 			"blueConnected3",
@@ -124,25 +146,25 @@ func TestPlcInputs(t *testing.T) {
 	plc.handler = modbus.NewTCPClientHandler("dummy")
 	plc.ioChangeNotifier = &websocket.Notifier{}
 
-	client.inputs[0] = true
+	client.inputs[fieldEStop] = true
 	plc.update()
 	assert.Equal(t, false, plc.GetFieldEStop())
-	client.inputs[0] = false
+	client.inputs[fieldEStop] = false
 	plc.update()
 	assert.Equal(t, true, plc.GetFieldEStop())
 
-	client.inputs[1] = true
-	client.inputs[2] = true
-	client.inputs[3] = true
-	client.inputs[4] = true
-	client.inputs[5] = true
-	client.inputs[6] = true
-	client.inputs[7] = true
-	client.inputs[8] = true
-	client.inputs[9] = true
-	client.inputs[10] = true
-	client.inputs[11] = true
-	client.inputs[12] = true
+	client.inputs[red1EStop] = true
+	client.inputs[red1AStop] = true
+	client.inputs[red2EStop] = true
+	client.inputs[red2AStop] = true
+	client.inputs[red3EStop] = true
+	client.inputs[red3AStop] = true
+	client.inputs[blue1EStop] = true
+	client.inputs[blue1AStop] = true
+	client.inputs[blue2EStop] = true
+	client.inputs[blue2AStop] = true
+	client.inputs[blue3EStop] = true
+	client.inputs[blue3AStop] = true
 	plc.update()
 	redEStops, blueEStops := plc.GetTeamEStops()
 	redAStops, blueAStops := plc.GetTeamAStops()
@@ -150,7 +172,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{false, false, false}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[1] = false
+	client.inputs[red1EStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -158,7 +180,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{false, false, false}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[2] = false
+	client.inputs[red1AStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -166,7 +188,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, false, false}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[3] = false
+	client.inputs[red2EStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -174,7 +196,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, false, false}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[4] = false
+	client.inputs[red2AStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -182,7 +204,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, false}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[5] = false
+	client.inputs[red3EStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -190,7 +212,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, false}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[6] = false
+	client.inputs[red3AStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -198,7 +220,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{false, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[7] = false
+	client.inputs[blue1EStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -206,7 +228,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{true, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{false, false, false}, blueAStops)
-	client.inputs[8] = false
+	client.inputs[blue1AStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -214,7 +236,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{true, false, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{true, false, false}, blueAStops)
-	client.inputs[9] = false
+	client.inputs[blue2EStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -222,7 +244,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{true, true, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{true, false, false}, blueAStops)
-	client.inputs[10] = false
+	client.inputs[blue2AStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -230,7 +252,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{true, true, false}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{true, true, false}, blueAStops)
-	client.inputs[11] = false
+	client.inputs[blue3EStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -238,7 +260,7 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{true, true, true}, blueEStops)
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{true, true, false}, blueAStops)
-	client.inputs[12] = false
+	client.inputs[blue3AStop] = false
 	plc.update()
 	redEStops, blueEStops = plc.GetTeamEStops()
 	redAStops, blueAStops = plc.GetTeamAStops()
@@ -247,42 +269,42 @@ func TestPlcInputs(t *testing.T) {
 	assert.Equal(t, [3]bool{true, true, true}, redAStops)
 	assert.Equal(t, [3]bool{true, true, true}, blueAStops)
 
-	client.inputs[13] = false
-	client.inputs[14] = false
-	client.inputs[15] = false
-	client.inputs[16] = false
-	client.inputs[17] = false
-	client.inputs[18] = false
+	client.inputs[redConnected1] = false
+	client.inputs[redConnected2] = false
+	client.inputs[redConnected3] = false
+	client.inputs[blueConnected1] = false
+	client.inputs[blueConnected2] = false
+	client.inputs[blueConnected3] = false
 	plc.update()
 	redConnected, blueConnected := plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{false, false, false}, redConnected)
 	assert.Equal(t, [3]bool{false, false, false}, blueConnected)
-	client.inputs[13] = true
+	client.inputs[redConnected1] = true
 	plc.update()
 	redConnected, blueConnected = plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{true, false, false}, redConnected)
 	assert.Equal(t, [3]bool{false, false, false}, blueConnected)
-	client.inputs[14] = true
+	client.inputs[redConnected2] = true
 	plc.update()
 	redConnected, blueConnected = plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{true, true, false}, redConnected)
 	assert.Equal(t, [3]bool{false, false, false}, blueConnected)
-	client.inputs[15] = true
+	client.inputs[redConnected3] = true
 	plc.update()
 	redConnected, blueConnected = plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{true, true, true}, redConnected)
 	assert.Equal(t, [3]bool{false, false, false}, blueConnected)
-	client.inputs[16] = true
+	client.inputs[blueConnected1] = true
 	plc.update()
 	redConnected, blueConnected = plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{true, true, true}, redConnected)
 	assert.Equal(t, [3]bool{true, false, false}, blueConnected)
-	client.inputs[17] = true
+	client.inputs[blueConnected2] = true
 	plc.update()
 	redConnected, blueConnected = plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{true, true, true}, redConnected)
 	assert.Equal(t, [3]bool{true, true, false}, blueConnected)
-	client.inputs[18] = true
+	client.inputs[blueConnected3] = true
 	plc.update()
 	redConnected, blueConnected = plc.GetEthernetConnected()
 	assert.Equal(t, [3]bool{true, true, true}, redConnected)

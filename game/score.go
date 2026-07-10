@@ -14,6 +14,14 @@ type Score struct {
 	Fouls           []Foul
 	PlayoffDq       bool
 	HubActive       bool
+
+	// 2026 Shift Scores
+	Shift1FuelCount     int
+	Shift2FuelCount     int
+	Shift3FuelCount     int
+	Shift4FuelCount     int
+	TransitionFuelCount int
+	EndgameFuelCount    int
 }
 
 // Game-specific settings that can be changed via the settings.
@@ -152,6 +160,12 @@ func (score *Score) Equals(other *Score) bool {
 		score.TeleopFuelCount != other.TeleopFuelCount ||
 		score.EndgameStatuses != other.EndgameStatuses ||
 		score.PlayoffDq != other.PlayoffDq ||
+		score.Shift1FuelCount != other.Shift1FuelCount ||
+		score.Shift2FuelCount != other.Shift2FuelCount ||
+		score.Shift3FuelCount != other.Shift3FuelCount ||
+		score.Shift4FuelCount != other.Shift4FuelCount ||
+		score.TransitionFuelCount != other.TransitionFuelCount ||
+		score.EndgameFuelCount != other.EndgameFuelCount ||
 		len(score.Fouls) != len(other.Fouls) {
 		return false
 	}

@@ -1278,6 +1278,20 @@ func (arena *Arena) handlePlcInputOutput() {
 			// [FIX] Only increment score if Hub is active; otherwise, delta is ignored but cleared.
 			if arena.RedRealtimeScore.CurrentScore.HubActive {
 				arena.RedRealtimeScore.CurrentScore.TeleopFuelCount += redDelta
+				timeVal := int(arena.MatchTimeSec())
+				if timeVal > 0 && timeVal < 33 {
+					arena.RedRealtimeScore.CurrentScore.TransitionFuelCount += redDelta
+				} else if timeVal < 58 {
+					arena.RedRealtimeScore.CurrentScore.Shift1FuelCount += redDelta
+				} else if timeVal < 83 {
+					arena.RedRealtimeScore.CurrentScore.Shift2FuelCount += redDelta
+				} else if timeVal < 108 {
+					arena.RedRealtimeScore.CurrentScore.Shift3FuelCount += redDelta
+				} else if timeVal < 133 {
+					arena.RedRealtimeScore.CurrentScore.Shift4FuelCount += redDelta
+				} else {
+					arena.RedRealtimeScore.CurrentScore.EndgameFuelCount += redDelta
+				}
 			}
 		}
 	}
@@ -1289,6 +1303,20 @@ func (arena *Arena) handlePlcInputOutput() {
 		} else if arena.MatchState == TeleopPeriod {
 			if arena.BlueRealtimeScore.CurrentScore.HubActive {
 				arena.BlueRealtimeScore.CurrentScore.TeleopFuelCount += blueDelta
+				timeVal := int(arena.MatchTimeSec())
+				if timeVal > 0 && timeVal < 33 {
+					arena.BlueRealtimeScore.CurrentScore.TransitionFuelCount += blueDelta
+				} else if timeVal < 58 {
+					arena.BlueRealtimeScore.CurrentScore.Shift1FuelCount += blueDelta
+				} else if timeVal < 83 {
+					arena.BlueRealtimeScore.CurrentScore.Shift2FuelCount += blueDelta
+				} else if timeVal < 108 {
+					arena.BlueRealtimeScore.CurrentScore.Shift3FuelCount += blueDelta
+				} else if timeVal < 133 {
+					arena.BlueRealtimeScore.CurrentScore.Shift4FuelCount += blueDelta
+				} else {
+					arena.BlueRealtimeScore.CurrentScore.EndgameFuelCount += blueDelta
+				}
 			}
 		}
 	}
