@@ -170,11 +170,10 @@ UI for controlling the alliance selection process.
         justify-content: center;
         min-width: 68px;
       }
-      /* Top 8 remaining (unpicked) teams styled in Yellow */
-      #availableTeamsGrid .team-tile:nth-child(-n+8) .team-rank {
+      .team-tile.captain-candidate .team-rank {
         background-color: #ffcd00;
       }
-      #availableTeamsGrid .team-tile:nth-child(-n+8) .team-body {
+      .team-tile.captain-candidate .team-body {
         border-left-color: #ffcd00;
       }
     </style>
@@ -249,6 +248,15 @@ UI for controlling the alliance selection process.
   $(function () {
     var startTime = moment(new Date()).hour(13).minute(0).second(0);
     newDateTimePicker("startTimePicker", startTime.toDate());
+
+    // Dynamically calculate remaining captain slots and highlight captain candidates
+    let captainSlotsRemaining = 0;
+    $("input[name^='selection'][name$='_0']").each(function() {
+      if ($(this).val() === "") {
+        captainSlotsRemaining++;
+      }
+    });
+    $("#availableTeamsGrid .team-tile").slice(0, captainSlotsRemaining).addClass("captain-candidate");
   });
 
   function onTeamTileClick(element, teamId) {

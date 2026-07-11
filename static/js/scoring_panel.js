@@ -52,17 +52,28 @@ function handleMatchTime(data) {
         // 2. 更新比賽狀態文字 (使用 translate 產生的標準文字)
         $("#match_state").text(matchStateText);
 
-        // 3. 處理 UI 透明度切換
+        // 3. 處理 UI 透明度切換與按鈕啟用
         if (matchState === "AUTO_PERIOD") {
             $("#auto-panel").css("opacity", "1");
             $("#teleop-panel").css("opacity", "0.5");
+            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
+                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END");
+            }
         } else if (matchState === "TELEOP_PERIOD") {
             $("#auto-panel").css("opacity", "0.5");
             $("#teleop-panel").css("opacity", "1");
-        } else if (matchState === "POST_MATCH") {
-            // 這裡原本的邏輯正確，保留
             if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                $("#commit_btn").prop("disabled", false).text("COMMIT SCORE");
+                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END");
+            }
+        } else if (matchState === "POST_MATCH") {
+            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
+                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
+                $("#commit_btn").prop("disabled", false).text("COMMIT SCORE").removeClass("btn-secondary").addClass(btnClass);
+            }
+        } else {
+            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
+                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
+                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END").removeClass("btn-secondary").addClass(btnClass);
             }
         }
     });
@@ -77,6 +88,22 @@ function handleMatchTime(data) {
 function handleRealtimeScore(data) {
     var myScore = (alliance === "red") ? data.Red.Score : data.Blue.Score;
     if (!myScore) return;
+
+    // Check MatchState from realtimeScore payload to safeguard commit button
+    if (data.MatchState !== undefined) {
+        var matchStateStr = matchStates[data.MatchState];
+        if (matchStateStr === "POST_MATCH") {
+            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
+                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
+                $("#commit_btn").prop("disabled", false).text("COMMIT SCORE").removeClass("btn-secondary").addClass(btnClass);
+            }
+        } else if (matchStateStr === "AUTO_PERIOD" || matchStateStr === "TELEOP_PERIOD" || matchStateStr === "PRE_MATCH") {
+            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
+                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
+                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END").removeClass("btn-secondary").addClass(btnClass);
+            }
+        }
+    }
 
     // 更新 Hub 狀態顏色
     updateHubUI(data.Red.Score.HubActive, data.Blue.Score.HubActive);
@@ -150,9 +177,11 @@ function updateClimb(robotIdx, level) {
 
 function commitScore() {
     websocket.send("commitMatch", {});
-    $("#commit_btn").text("SCORE COMMITTED").addClass("btn-secondary").removeClass("btn-primary").prop("disabled", true);
+    var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
+    $("#commit_btn").text("SCORE COMMITTED").addClass("btn-secondary").removeClass(btnClass).prop("disabled", true);
 }
 
 function resetLocalState() {
-    $("#commit_btn").text("WAIT FOR MATCH END").prop("disabled", true).removeClass("btn-secondary").addClass("btn-primary");
+    var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
+    $("#commit_btn").text("WAIT FOR MATCH END").prop("disabled", true).removeClass("btn-secondary").removeClass("btn-danger").removeClass("btn-primary").addClass(btnClass);
 }

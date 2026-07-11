@@ -9,6 +9,9 @@
   <head>
     <title>Audience Display - {{.EventSettings.Name}} - Cheesy Arena </title>
     <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/lib/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/css/lib/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/static/css/cheesy-arena.css" />
@@ -284,9 +287,17 @@
 
 
     <div id="allianceSelectionCentering" style="display: none;">
+      <div class="alliance-header-row">
+        <span class="alliance-header-title">Alliances</span>
+        <div id="allianceTimerBox" class="alliance-timer-box" style="display: none;">
+          <div class="alliance-timer-icon">⏳</div>
+          <div id="allianceSelectionTimer" class="alliance-timer-text">0:00</div>
+        </div>
+      </div>
       <div id="allianceSelection"></div>
     </div>
     <div id="allianceRankingsCentering" {{if .SelectionShowUnpickedTeams}}class="enabled"{{end}} style="display: none;">
+      <div class="rankings-header-title">Available Teams</div>
       <div id="allianceRankings"></div>
     </div>
     <div id="lowerThird">
@@ -299,15 +310,12 @@
       <table id="allianceSelectionTable">
         {{"{{#each alliances}}"}}
           <tr>
-            <td class="alliance-cell">{{"{{Index}}"}}</td>
+            <td class="alliance-index-cell">{{"{{Index}}"}}</td>
             {{"{{#each this.TeamIds}}"}}
               <td class="selection-cell">{{"{{#if this}}"}}{{"{{this}}"}}{{"{{/if}}"}}</td>
             {{"{{/each}}"}}
           </tr>
         {{"{{/each}}"}}
-        <tr>
-          <td id="allianceSelectionTimer" colspan="{{"{{numColumns}}"}}"></td>
-        </tr>
       </table>
     </script>
     <script id="sponsorImageTemplate" type="text/x-handlebars-template">

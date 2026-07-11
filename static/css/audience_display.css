@@ -709,89 +709,158 @@ html {
 }
 #allianceRankingsCentering {
   position: absolute;
-  height: 100%;
-  left: 3em;
-  top: 3em;
+  left: 4em;
+  bottom: 11em; /* Kept safely above the bottom row to reserve space for match info */
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.8em; /* Base size for unpicked grid */
+}
+#allianceRankingsCentering.empty-grid {
+  display: none !important;
+}
+.rankings-header-title {
+  font-weight: 800;
+  font-size: 1.3em;
+  color: #111;
+  margin-bottom: 0.5em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 #allianceRankings {
-  max-width: 42em; /* Fits exactly 8 tiles per row */
-  max-height: 92%;
+  height: 10.1em; /* Fits exactly 4 rows */
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column wrap; /* Flow vertically first */
   align-content: flex-start;
-  gap: 0.3em;
-  padding: 0.5em;
-  background-color: rgba(6, 35, 75, 0.8);
-  border: 3px solid #ffcd00;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-  font-family: 'Arboto Bold', sans-serif;
-  font-weight: 700;  /* bold */
-  font-size: 2em;
+  gap: 0.4em;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+#allianceRankings:empty {
+  display: none !important;
 }
 .team-tile-display {
   display: flex;
   flex-direction: row;
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  height: 2em;
+  border: 1px solid #ccc;
+  height: 2.2em;
+  background-color: #fff;
+  margin-right: 0.4em;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 .team-rank-display {
-  width: 2em;
-  background-color: #0dcaf0;
-  color: #111;
-  font-size: 0.85em;
+  width: 2.4em;
+  background-color: #34495e; /* Default dark grey-blue for ranks */
+  color: #fff;
+  font-size: 0.9em;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.team-tile-display:nth-child(-n+8) .team-rank-display {
-  background-color: #ffcd00;
+.captain-candidate .team-rank-display {
+  background-color: #e67e22; /* Orange for captain candidates! */
 }
 .team-body-display {
-  width: 2.8em;
-  background-color: #00457f;
-  color: #fff;
-  font-size: 0.8em;
+  width: 3.5em;
+  background-color: #fff;
+  color: #2c3e50;
+  font-size: 0.95em;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-left: 2px solid #0dcaf0;
-}
-.team-tile-display:nth-child(-n+8) .team-body-display {
-  border-left-color: #ffcd00;
+  border-left: 1px solid #ddd;
 }
 #allianceSelectionCentering {
   position: absolute;
-  height: 100%;
   top: 3em;
-  right: 3em;
+  right: 4em;
+  /* Naturally flows from top-right. Bottom is kept clear. */
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.8em; /* Base size matching unpicked grid */
 }
-#allianceSelection {
-  display: table-cell;
-  vertical-align: middle;
+.alliance-header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6em;
+  width: 14.5em; /* Matches the exact width of the table! */
+}
+.alliance-header-title {
+  font-size: 1.3em;
+  font-weight: 800;
+  color: #111;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.alliance-timer-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  height: 2.0em;
+}
+.alliance-timer-icon {
+  background-color: #f1c40f; /* Yellow */
+  color: #000;
+  font-size: 1.1em;
+  width: 2.0em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #ccc;
+}
+.alliance-timer-text {
+  font-size: 1.1em;
+  font-weight: 800;
+  padding: 0 0.8em;
+  color: #000;
 }
 #allianceSelectionTable {
   background-color: #fff;
-  border: 2px solid #222;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  width: 14.5em;
+}
+#allianceSelectionTable tr {
+  border-bottom: 1px solid #eee;
+}
+#allianceSelectionTable tr:last-child {
+  border-bottom: none;
+}
+.alliance-index-cell {
+  background-color: #f1c40f; /* Yellow */
+  color: #000;
+  font-size: 1.1em;
+  font-weight: 800;
+  width: 2.0em;
   text-align: center;
-  font-family: 'Arboto Bold', sans-serif;
-  font-weight: 700;  /* bold */
-  font-size: 2.6em;
-}
-#allianceSelectionTable tr:nth-child(even) {
-  background-color: #ccc;
-}
-.alliance-cell {
-  padding: 0px 20px;
-  font-family: 'Arboto Bold', sans-serif;
-  font-weight: 700;  /* bold */
-  color: #999;
+  padding: 0.35em 0;
+  border-right: 2px solid #ccc;
 }
 .selection-cell {
-  width: 3.1em;
-  color: #222;
+  padding: 0.35em 0.8em;
+  color: #2c3e50;
+  font-size: 1.1em;
+  font-weight: 800;
+  text-align: center;
+  border-right: 1px solid #eee;
+  width: 4em;
+  background-color: #fff;
+}
+.selection-cell:last-child {
+  border-right: none;
 }
 #lowerThird {
   display: none;
