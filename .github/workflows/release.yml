@@ -49,33 +49,25 @@ jobs:
           VERSION="${{ env.VERSION }}"
           ASSETS="LICENSE README.md font schedules static switch_config.txt templates tunnel"
 
-          # 1. Linux x64
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=linux GOARCH=amd64 go build -o cheesy-arena/cheesy-arena .
-          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
-          zip -r -X "cheesy-arena.${VERSION}.linux.x64.zip" cheesy-arena
+          build_platform() {
+            local zip_name="$1"
+            local target_os="$2"
+            local target_arch="$3"
+            local bin_name="$4"
 
-          # 2. macOS x64 (Intel)
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=darwin GOARCH=amd64 go build -o cheesy-arena/cheesy-arena .
-          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
-          zip -r -X "cheesy-arena.${VERSION}.macos.x64.zip" cheesy-arena
+            rm -rf cheesy-arena
+            mkdir cheesy-arena
+            GOOS="$target_os" GOARCH="$target_arch" go build -o "cheesy-arena/$bin_name" .
+            for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
+            zip -r -X "$zip_name" cheesy-arena
+            rm -rf cheesy-arena
+          }
 
-          # 3. macOS ARM64 (Apple Silicon M1/M2/M3)
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=darwin GOARCH=arm64 go build -o cheesy-arena/cheesy-arena .
-          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
-          zip -r -X "cheesy-arena.${VERSION}.macos.arm64.zip" cheesy-arena
-
-          # 4. Windows x64
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=windows GOARCH=amd64 go build -o cheesy-arena/cheesy-arena.exe .
-          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
-          zip -r -X "cheesy-arena.${VERSION}.windows.x64.zip" cheesy-arena
+          # Build for all 4 platforms
+          build_platform "cheesy-arena.${VERSION}.linux.x64.zip" "linux" "amd64" "cheesy-arena"
+          build_platform "cheesy-arena.${VERSION}.macos.x64.zip" "darwin" "amd64" "cheesy-arena"
+          build_platform "cheesy-arena.${VERSION}.macos.arm64.zip" "darwin" "arm64" "cheesy-arena"
+          build_platform "cheesy-arena.${VERSION}.windows.x64.zip" "windows" "amd64" "cheesy-arena.exe"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
