@@ -50,7 +50,7 @@ type TeamSign struct {
 
 const (
 	teamSignAddressPrefix            = "10.0.100."
-	teamSignYear                     = 2025
+	teamSignYear                     = 2026
 	teamSignPort                     = 10011
 	teamSignPacketMagicString        = "CYPRX"
 	teamSignPacketHeaderLength       = 7
@@ -194,11 +194,11 @@ func generateInMatchTeamRearText(arena *Arena, isRed bool, countdown string) str
 	if isRed {
 		realtimeScore = arena.RedRealtimeScore
 		opponentRealtimeScore = arena.BlueRealtimeScore
-		formatString = "R%03d-B%03d"
+		formatString = "R%03d-B%03d\n"
 	} else {
 		realtimeScore = arena.BlueRealtimeScore
 		opponentRealtimeScore = arena.RedRealtimeScore
-		formatString = "B%03d-R%03d"
+		formatString = "B%03d-R%03d\n"
 	}
 	scoreSummary := realtimeScore.CurrentScore.Summarize(&opponentRealtimeScore.CurrentScore)
 	scoreTotal := scoreSummary.Score // Removed BargePoints logic
@@ -260,7 +260,7 @@ func generateTimerTexts(arena *Arena, countdown, inMatchRearText string) (string
 		frontText = "SAFE "
 		frontColor = greenColor
 	} else if arena.FieldVolunteers && arena.MatchState != TimeoutActive {
-		frontText = "count"
+		frontText = "CLEAn"
 		frontColor = purpleColor
 	} else {
 		frontText = countdown
