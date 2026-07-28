@@ -1,111 +1,100 @@
+name: Create Release
+
 on:
   push:
     tags:
       - "v*"
-name: Create Release
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Release Version Tag (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
 jobs:
-  create_release:
+  build_and_release:
+    name: Build Multi-Platform Release Assets
     runs-on: ubuntu-latest
-    env:
-      ASSET_FILES: LICENSE README.md access_point_config.tar.gz fix_avatar_colors_for_overlay font schedules static
-        switch_config.txt templates tunnel
+
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.22.x
-
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Cheesy Arena ${{ github.ref }}
-          body: This is a release of Cheesy Arena for the 2025 FRC game, REEFSCAPE. Download the version for your
-            operating system below. Supported operating systems are Linux, macOS (x64 and M1), and Windows.
+          go-version: '1.25.x'
+          check-latest: true
+
+      - name: Determine Version Tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG_NAME="${{ github.event.inputs.version_tag }}"
+          elif [ -n "${{ github.ref_name }}" ]; then
+            TAG_NAME="${{ github.ref_name }}"
+          else
+            TAG_NAME="v1.0.0"
+          fi
+          echo "VERSION=${TAG_NAME#v}" >> $GITHUB_ENV
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+      - name: Build Bundles for Platforms
+        run: |
+          VERSION="${{ env.VERSION }}"
+          ASSETS="LICENSE README.md font schedules static switch_config.txt templates tunnel"
+
+          # 1. Linux x64
+          rm -rf cheesy-arena*
+          mkdir cheesy-arena
+          GOOS=linux GOARCH=amd64 go build -o cheesy-arena/cheesy-arena .
+          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
+          zip -r -X "cheesy-arena.${VERSION}.linux.x64.zip" cheesy-arena
+
+          # 2. macOS x64 (Intel)
+          rm -rf cheesy-arena*
+          mkdir cheesy-arena
+          GOOS=darwin GOARCH=amd64 go build -o cheesy-arena/cheesy-arena .
+          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
+          zip -r -X "cheesy-arena.${VERSION}.macos.x64.zip" cheesy-arena
+
+          # 3. macOS ARM64 (Apple Silicon M1/M2/M3)
+          rm -rf cheesy-arena*
+          mkdir cheesy-arena
+          GOOS=darwin GOARCH=arm64 go build -o cheesy-arena/cheesy-arena .
+          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
+          zip -r -X "cheesy-arena.${VERSION}.macos.arm64.zip" cheesy-arena
+
+          # 4. Windows x64
+          rm -rf cheesy-arena*
+          mkdir cheesy-arena
+          GOOS=windows GOARCH=amd64 go build -o cheesy-arena/cheesy-arena.exe .
+          for item in $ASSETS; do [ -e "$item" ] && cp -r "$item" cheesy-arena/; done
+          zip -r -X "cheesy-arena.${VERSION}.windows.x64.zip" cheesy-arena
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Cheesy Arena ${{ env.TAG_NAME }}
+          body: |
+            ## Cheesy Arena Release ${{ env.TAG_NAME }}
+
+            Pre-built automated binary packages for Windows, macOS (Intel & Apple Silicon), and Linux.
+
+            ### Download Packages:
+            - `cheesy-arena.${{ env.VERSION }}.windows.x64.zip` (Windows 64-bit)
+            - `cheesy-arena.${{ env.VERSION }}.macos.arm64.zip` (macOS Apple Silicon M1/M2/M3)
+            - `cheesy-arena.${{ env.VERSION }}.macos.x64.zip` (macOS Intel 64-bit)
+            - `cheesy-arena.${{ env.VERSION }}.linux.x64.zip` (Linux 64-bit)
+          files: |
+            cheesy-arena.*.zip
           draft: false
           prerelease: false
-
-      - name: Set additional environment variables
-        run: |
-          echo "LINUX_X64_FILENAME=cheesy-arena.${GITHUB_REF:10}.linux.x64.zip" >> $GITHUB_ENV
-          echo "MACOS_X64_FILENAME=cheesy-arena.${GITHUB_REF:10}.macos.x64.zip" >> $GITHUB_ENV
-          echo "MACOS_M1_FILENAME=cheesy-arena.${GITHUB_REF:10}.macos.m1.zip" >> $GITHUB_ENV
-          echo "WINDOWS_X64_FILENAME=cheesy-arena.${GITHUB_REF:10}.windows.x64.zip" >> $GITHUB_ENV
-
-      - name: Build Linux bundle
-        run: |
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=linux GOARCH=amd64 go build -o cheesy-arena/
-          cp -r ${{ env.ASSET_FILES }} cheesy-arena/
-          zip -r -X ${{ env.LINUX_X64_FILENAME }} cheesy-arena
-
-      - name: Upload Linux bundle
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.LINUX_X64_FILENAME }}
-          asset_name: ${{ env.LINUX_X64_FILENAME }}
-          asset_content_type: application/zip
-
-      - name: Build MacOS x64 bundle
-        run: |
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=darwin GOARCH=amd64 go build -o cheesy-arena/
-          cp -r ${{ env.ASSET_FILES }} cheesy-arena/
-          zip -r -X ${{ env.MACOS_X64_FILENAME }} cheesy-arena
-
-      - name: Upload MacOS x64 bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.MACOS_X64_FILENAME }}
-          asset_name: ${{ env.MACOS_X64_FILENAME }}
-          asset_content_type: application/zip
-
-      - name: Build MacOS M1 bundle
-        run: |
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=darwin GOARCH=arm64 go build -o cheesy-arena/
-          cp -r ${{ env.ASSET_FILES }} cheesy-arena/
-          zip -r -X ${{ env.MACOS_M1_FILENAME }} cheesy-arena
-
-      - name: Upload MacOS M1 bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.MACOS_M1_FILENAME }}
-          asset_name: ${{ env.MACOS_M1_FILENAME }}
-          asset_content_type: application/zip
-
-      - name: Build Windows bundle
-        run: |
-          rm -rf cheesy-arena*
-          mkdir cheesy-arena
-          GOOS=windows GOARCH=amd64 go build -o cheesy-arena/
-          cp -r ${{ env.ASSET_FILES }} cheesy-arena/
-          zip -r -X ${{ env.WINDOWS_X64_FILENAME }} cheesy-arena
-
-      - name: Upload Windows bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.WINDOWS_X64_FILENAME }}
-          asset_name: ${{ env.WINDOWS_X64_FILENAME }}
-          asset_content_type: application/zip
