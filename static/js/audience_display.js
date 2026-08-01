@@ -50,8 +50,10 @@ let matchData = null;
 
 // Handles a websocket message to change which screen is displayed.
 const handleAudienceDisplayMode = function (targetScreen) {
-  $("#broadcastFooter").css("display", targetScreen === "match" ? "flex" : "none");
-  transitionQueue.push(targetScreen);
+  // Coalesce repeated notifier messages while a transition is already running.
+  if (transitionQueue[transitionQueue.length - 1] !== targetScreen) {
+    transitionQueue.push(targetScreen);
+  }
   executeTransitionQueue();
 };
 
@@ -70,7 +72,7 @@ const executeTransitionQueue = function () {
       // When the current transition is complete, call this method again to invoke the next one in the queue.
       currentScreen = targetScreen;
       transitionInProgress = false;
-      setTimeout(executeTransitionQueue, 100);  // A small delay is needed to avoid visual glitches.
+      setTimeout(executeTransitionQueue, 20);
     };
 
     if (targetScreen === currentScreen) {
@@ -481,15 +483,20 @@ const transitionBlankToBracket = function (callback) {
 };
 
 const transitionBlankToIntro = function (callback) {
-  $("#overlayCentering").transition(overlayCenteringShowParams, 500, "ease", function () {
-    $(".teams").css("display", "flex");
-    $(".avatars").css("display", "flex");
-    $(".avatars").css("opacity", 1);
-    $(".score").transition({ queue: false, width: scoreMid }, 500, "ease", function () {
-      $("#eventMatchInfo").css("display", "flex");
-      $("#eventMatchInfo").transition({ queue: false, height: eventMatchInfoDown }, 500, "ease", callback);
-    });
-  });
+  $("#broadcastFooter").hide();
+  $(".teams").css({ display: "flex", opacity: 1 });
+  $(".avatars").css({ display: "flex", opacity: 1 });
+  $("#left_Hubactive, #right_Hubactive").hide();
+  $(".score-number, #matchTime, .score-fields").css("opacity", 0);
+  $("#eventMatchInfo").css({ display: "grid", height: eventMatchInfoDown });
+  $("#overlayCentering")
+    .css({ top: overlayCenteringTopUp, opacity: 0 })
+    .transition(
+      { queue: false, top: overlayCenteringTopShowParams.top, opacity: 1 },
+      420,
+      "ease",
+      callback,
+    );
 };
 
 const transitionBlankToLogo = function (callback) {
@@ -512,19 +519,22 @@ const transitionBlankToLogoLuma = function (callback) {
 };
 
 const transitionBlankToMatch = function (callback) {
-  $("#overlayCentering").transition(overlayCenteringShowParams, 500, "ease", function () {
-    $(".teams").css("display", "flex");
-    $(".score-fields").css("display", "flex");
-    $(".score-fields").transition({ queue: false, width: scoreFieldsOut }, 500, "ease");
-    $("#logo").transition({ queue: false, top: logoUp }, 500, "ease");
-    $(".score").transition({ queue: false, width: scoreOut }, 500, "ease", function () {
-      $("#eventMatchInfo").css("display", "flex");
-      $("#eventMatchInfo").transition({ queue: false, height: eventMatchInfoDown }, 500, "ease", callback);
-      $(".score-number").transition({ queue: false, opacity: 1 }, 750, "ease");
-      $("#matchTime").transition({ queue: false, opacity: 1 }, 750, "ease");
-      $(".score-fields").transition({ queue: false, opacity: 1 }, 750, "ease");
-    });
-  });
+  $(".teams").css({ display: "flex", opacity: 1 });
+  $("#left_Hubactive, #right_Hubactive").show().css("opacity", 1);
+  $(".score-fields").css({ display: "flex", opacity: 1 });
+  $(".score-number, #matchTime").css("opacity", 1);
+  $("#eventMatchInfo").css({ display: "grid", height: eventMatchInfoDown });
+  $("#broadcastFooter").css({ display: "flex", opacity: 0 });
+  $("#broadcastFooter").transition({ queue: false, opacity: 1 }, 320, "ease");
+
+  $("#overlayCentering")
+    .css({ top: overlayCenteringTopUp, opacity: 0 })
+    .transition(
+      { queue: false, top: overlayCenteringTopShowParams.top, opacity: 1 },
+      420,
+      "ease",
+      callback,
+    );
 };
 
 const transitionBlankToScore = function (callback) {
@@ -595,30 +605,32 @@ const transitionBracketToSponsor = function (callback) {
 };
 
 const transitionIntroToBlank = function (callback) {
-  $("#eventMatchInfo").transition({ queue: false, height: eventMatchInfoUp }, 500, "ease", function () {
-    $("#eventMatchInfo").hide();
-    $(".score").transition({ queue: false, width: scoreIn }, 500, "ease", function () {
-      $(".avatars").css("opacity", 0);
-      $(".avatars").hide();
-      $(".teams").hide();
-      $("#overlayCentering").transition(overlayCenteringHideParams, 1000, "ease", callback);
-    });
-
-  });
+  $("#overlayCentering").transition(
+    { queue: false, top: overlayCenteringTopUp, opacity: 0 },
+    380,
+    "ease",
+    function () {
+      $(".avatars, .teams, #eventMatchInfo").hide();
+      $("#overlayCentering").css("opacity", 1);
+      callback();
+    },
+  );
 };
 
 const transitionIntroToMatch = function (callback) {
-  $(".avatars").transition({ queue: false, opacity: 0 }, 500, "ease", function () {
-    $(".avatars").hide();
+  $("#left_Hubactive, #right_Hubactive").show().css("opacity", 1);
+  $(".avatars").transition({ queue: false, opacity: 0 }, 250, "ease", function () {
+    $(this).hide();
   });
   $(".score-fields").css("display", "flex");
-  $(".score-fields").transition({ queue: false, width: scoreFieldsOut }, 500, "ease");
-  $("#logo").transition({ queue: false, top: logoUp }, 500, "ease");
-  $(".score").transition({ queue: false, width: scoreOut }, 500, "ease", function () {
-    $(".score-number").transition({ queue: false, opacity: 1 }, 750, "ease");
-    $("#matchTime").transition({ queue: false, opacity: 1 }, 750, "ease", callback);
-    $(".score-fields").transition({ queue: false, opacity: 1 }, 750, "ease");
-  });
+  $("#broadcastFooter").css({ display: "flex", opacity: 0 });
+  $("#broadcastFooter").transition({ queue: false, opacity: 1 }, 300, "ease");
+  $(".score-number, #matchTime, .score-fields").transition(
+    { queue: false, opacity: 1 },
+    350,
+    "ease",
+  );
+  setTimeout(callback, 350);
 };
 
 const transitionIntroToTimeout = function (callback) {
@@ -708,33 +720,39 @@ const transitionLogoLumaToScore = function (callback) {
 };
 
 const transitionMatchToBlank = function (callback) {
-  $("#eventMatchInfo").transition({ queue: false, height: eventMatchInfoUp }, 500, "ease");
-  $("#matchTime").transition({ queue: false, opacity: 0 }, 300, "linear");
-  $(".score-fields").transition({ queue: false, opacity: 0 }, 300, "ease");
-  $(".score-number").transition({ queue: false, opacity: 0 }, 300, "linear", function () {
-    $("#eventMatchInfo").hide();
-    $(".score-fields").transition({ queue: false, width: 0 }, 500, "ease");
-    $("#logo").transition({ queue: false, top: logoDown }, 500, "ease");
-    $(".score").transition({ queue: false, width: scoreIn }, 500, "ease", function () {
-      $(".teams").hide();
-      $(".score-fields").hide();
-      $("#overlayCentering").transition(overlayCenteringHideParams, 1000, "ease", callback);
-    });
-  });
+  $("#broadcastFooter").transition({ queue: false, opacity: 0 }, 280, "ease");
+  $("#overlayCentering").transition(
+    { queue: false, top: overlayCenteringTopUp, opacity: 0 },
+    400,
+    "ease",
+    function () {
+      $(".teams, .score-fields, #eventMatchInfo").hide();
+      $("#broadcastFooter").hide().css("opacity", 1);
+      $(".score-number, #matchTime, .score-fields").css("opacity", 1);
+      $("#overlayCentering").css("opacity", 1);
+      callback();
+    },
+  );
 };
 
 const transitionMatchToIntro = function (callback) {
-  $(".score-number").transition({ queue: false, opacity: 0 }, 300, "linear");
-  $(".score-fields").transition({ queue: false, opacity: 0 }, 300, "ease");
-  $("#matchTime").transition({ queue: false, opacity: 0 }, 300, "linear", function () {
-    $(".score-fields").transition({ queue: false, width: 0 }, 500, "ease");
-    $("#logo").transition({ queue: false, top: logoDown }, 500, "ease");
-    $(".score").transition({ queue: false, width: scoreMid }, 500, "ease", function () {
-      $(".score-fields").hide();
-      $(".avatars").css("display", "flex");
-      $(".avatars").transition({ queue: false, opacity: 1 }, 500, "ease", callback);
-    });
+  $("#left_Hubactive, #right_Hubactive").transition({ queue: false, opacity: 0 }, 220, "ease", function () {
+    $(this).hide().css("opacity", 1);
   });
+  $("#broadcastFooter").transition({ queue: false, opacity: 0 }, 250, "ease", function () {
+    $(this).hide().css("opacity", 1);
+  });
+  $(".score-number, #matchTime, .score-fields").transition(
+    { queue: false, opacity: 0 },
+    280,
+    "ease",
+    function () {
+      $(".score-fields").hide();
+      $(".avatars").css({ display: "flex", opacity: 0 });
+      $(".avatars").transition({ queue: false, opacity: 1 }, 280, "ease");
+    },
+  );
+  setTimeout(callback, 300);
 };
 
 const transitionScoreToBlank = function (callback) {
