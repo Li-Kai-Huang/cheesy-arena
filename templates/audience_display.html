@@ -20,14 +20,30 @@
   <body>
     <div id="overlayCentering">
       <div id="matchOverlayContainer">
+        <div class="score-fields score-left external-score-fields external-score-fields-left">
+          <div class="score-field">
+            <img class="coral-icon" src="/static/img/blue_Fuelgoal.png" />
+            <div id="leftCoral"></div>
+          </div>
+        </div>
+        <div class="score-field coopertition" id="left_Hubactive"></div>
+
+        <div class="score-field coopertition" id="right_Hubactive"></div>
+        <div class="score-fields external-score-fields external-score-fields-right">
+          <div class="score-field">
+            <div id="rightCoral"></div>
+            <img class="coral-icon" src="/static/img/red_Fuelgoal.png" />
+          </div>
+        </div>
+
         <div class="playoff-alliance" id="leftPlayoffAlliance"></div>
         <div id="matchOverlay">
           <!--Match 介紹(灰色)-->
           <div id="eventMatchInfo">
-            <img class="Dive" src="/static\img\frc_rebuilt.png" />
+            <img class="Dive" src="/static/img/frc_age.png" />
             <!--<span>{{.EventSettings.Name}}</span>-->
             <span id="matchName"></span>
-            <img class="Reescape" src="/static\img\frc_age.png" />
+            <img class="Reescape" src="/static/img/frc_rebuilt.png" />
 
           </div>
           <div id="matchOverlayTop">
@@ -48,31 +64,12 @@
               </div>
 
               <div class="score reversible-left" data-reversed="false">
-                <div class="score-fields score-left">
-                  <div class="score-field">
-                    <div id="leftCoral"></div>
-                    <img class="coral-icon" src="/static/img/red_Fuelgoal.png" />
-
-                  </div>
-
-                  <div class="score-field coopertition" id="left_Hubactive"></div>
-                </div>
-                
+                <div class="score-number" id="leftScoreNumber"></div>
               </div>
               
             </div>
             <div class="number-score">
-              <div class="number" id="rednumber">
-                <span>Red</span>
-                <div class="score-number" id="leftScoreNumber"></div>
-              </div>
               <div class="number" id="number-center"></div>
-              <div class="number" id="bluenumber">
-                <span>Blue</span>
-                <div class="score-number" id="rightScoreNumber"></div>
-                
-              </div>
-
             </div>
             
 
@@ -94,18 +91,7 @@
 
               </div>
               <div class="score score-right reversible-right">
-                <div class="score-fields">
-                <div class="score-field coopertition" id="right_Hubactive"></div>
-                  <div class="score-field">
-                    <img class="coral-icon" src="/static/img/blue_Fuelgoal.png" />
-                    <div id="rightCoral"></div>
-                  </div>
-                </div>
-                <!--<div class="avatars">
-                  <img class="avatar" id="rightTeam1Avatar" src="" />
-                  <img class="avatar" id="rightTeam2Avatar" src="" />
-                  <img class="avatar" id="rightTeam3Avatar" src="" />
-                </div>-->
+                <div class="score-number" id="rightScoreNumber"></div>
               </div>
               
             </div>
@@ -286,6 +272,14 @@
     </div>
 
 
+    <div id="allianceSelectionBackground" style="display: none;">
+      <div class="alliance-selection-bg-piece alliance-selection-bg-top"></div>
+      <div class="alliance-selection-bg-piece alliance-selection-bg-left"></div>
+      <div class="alliance-selection-bg-piece alliance-selection-bg-right"></div>
+      <div class="alliance-selection-bg-piece alliance-selection-bg-bottom"></div>
+      <div class="alliance-selection-video-frame"></div>
+    </div>
+
     <div id="allianceSelectionCentering" style="display: none;">
       <div class="alliance-header-row">
         <span class="alliance-header-title">Alliances</span>
@@ -299,6 +293,14 @@
     <div id="allianceRankingsCentering" {{if .SelectionShowUnpickedTeams}}class="enabled"{{end}} style="display: none;">
       <div class="rankings-header-title">Available Teams</div>
       <div id="allianceRankings"></div>
+    </div>
+    <div id="broadcastFooter" style="display: none;">
+      <div class="broadcast-footer-title">
+        <span class="broadcast-footer-mark">◆</span>
+        <span>{{.EventSettings.Name}}</span>
+      </div>
+      <div class="broadcast-footer-presented">Presented By</div>
+      <img class="broadcast-footer-logo" src="/static/img/lower-third-logo.png" alt="Sponsor" />
     </div>
     <div id="lowerThird">
       <img id="lowerThirdLogo" src="/static/img/lower-third-logo.png" alt="logo" />

@@ -25,8 +25,8 @@ type Score struct {
 }
 
 // Game-specific settings that can be changed via the settings.
-var EnergizedFuelThreshold = 360    // Number of balls required to obtain an Energized RP
-var SuperchargedFuelThreshold = 500 // Number of balls required to obtain a Supercharged RP
+var EnergizedFuelThreshold = 100    // Number of balls required to obtain an Energized RP
+var SuperchargedFuelThreshold = 360 // Number of balls required to obtain a Supercharged RP
 var TraversalPointThreshold = 50    // Number of tower points required to obtain a Traversal RP
 
 // Represents the state of a robot at the end of the match.

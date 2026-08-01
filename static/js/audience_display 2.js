@@ -149,53 +149,68 @@ const handleMatchLoad = function (data) {
 // Handles a websocket message to update the match time countdown.
 const handleMatchTime = function (data) {
   translateMatchTime(data, function (matchState, matchStateText, countdownSec) {
-    $("body").attr("data-match-state", matchState);
-    $("#matchTime").text(matchState === "POST_MATCH" ? "0:00" : getCountdownString(countdownSec));
+    $("#matchTime").text(getCountdownString(countdownSec));
   });
+  
+ // --- 即時更新 Coopertition 邏輯 ---
+    // 根據 reversed 判斷紅藍方在哪一邊
+    const redElement = (redSide === "left") ? "#left_Hubactive" : "#right_Hubactive";
+    const blueElement = (blueSide === "left") ? "#left_Hubactive" : "#right_Hubactive";
 
-  // Place the active-Hub arrow on the physical side where that alliance is displayed.
-  const setHubActive = function (side, active) {
-    const element = $(`#${side}_Hubactive`);
-    if (!active || data.MatchState === 6) {
-      element.empty();
-      return;
-    }
-    element.html(
-      `<img class="hub-active-arrow" src="/static/img/hubactive_${side}.png" alt="Active Hub">`
+    // 判斷紅方狀態
+    $(redElement).html(
+        data.HubActiveRed === true
+        ? '<img src="/static/img/hubactive_left.png" alt="✔" style="width:60px;height:60px;margin:20px 5px;">'
+        : ''
     );
-  };
-  setHubActive(redSide, data.HubActiveRed === true);
-  setHubActive(blueSide, data.HubActiveBlue === true);
 
-  // The official layout shows the shift row only during Teleop.
-  const isTeleop = data.MatchState === 5;
-  $("#shiftCounter, #shiftTime").toggle(isTeleop);
-  if (isTeleop) {
-    $("#currentShift").text(data.CurrentShift);
-    $("#shiftTime").text(`:${String(data.ShiftTimeSec).padStart(2, "0")}`);
-  }
+    // 判斷藍方狀態
+    $(blueElement).html(
+        data.HubActiveBlue === true
+        ? '<img src="/static/img/hubactive_right.png" alt="✔" style="width:60px;height:60px;margin:20px 5px;">'
+        : ''
+    );
+
+  // 3. 顯示 Shift 轉換次數與固定計時器位置
+    if (data.MatchState === 5) { // TELEOP 手動階段
+        $("#shiftCounter, #shiftTime").show();
+        
+        // 直接顯示後台傳來的數據，例如：0, 1, 2, 3, 4, 5
+        // 後端傳什麼，這裡就顯示什麼
+        $("#currentShift").text(data.CurrentShift);
+    // 直接顯示後端傳來的階段剩餘秒數，並補齊兩位數格式 (例如 :25, :05)
+        const sTime = data.ShiftTimeSec;
+        $("#shiftTime").text(":" + (sTime < 10 ? "0" : "") + sTime);
+      $("#logo").css("visibility", "hidden");
+    } 
+    else {
+        $("#shiftCounter, #shiftTime").hide();
+        $("#logo").css("visibility", "visible");
+    }
 };
 
 // Handles a websocket message to update the match score.
 const handleRealtimeScore = function (data) {
   $(`#${redSide}ScoreNumber`).text(data.Red.ScoreSummary.Score);
   $(`#${blueSide}ScoreNumber`).text(data.Blue.ScoreSummary.Score);
-  let redCoral;
-  let blueCoral;
+  let redCoral, blueCoral;
+  let redfuelgoal,bluefuelgoal;
 
-  // Show progress toward the first unmet Fuel RP: 360 first, then 500.
-  const getFuelGoal = (summary) => summary.EnergizedRankingPoint
-    ? data.SuperchargedFuelThreshold
-    : data.EnergizedFuelThreshold;
+  // 定義一個取得燃料目標值的輔助函式，減少重複程式碼
+  const getFuelGoal = (summary) => (summary.EnergizedRankingPoint ? 360 : 100);
 
   if (currentMatch.Type === matchTypePlayoff) {
-    redCoral = data.Red.ScoreSummary.TotalFuelPoints;
-    blueCoral = data.Blue.ScoreSummary.TotalFuelPoints;
+      redCoral = data.Red.ScoreSummary.TotalFuelPoints;
+      blueCoral = data.Blue.ScoreSummary.TotalFuelPoints;
   } else {
-    const redFuelGoal = getFuelGoal(data.Red.ScoreSummary);
-    const blueFuelGoal = getFuelGoal(data.Blue.ScoreSummary);
-    redCoral = `${data.Red.ScoreSummary.TotalFuelPoints} / ${redFuelGoal}`;
-    blueCoral = `${data.Blue.ScoreSummary.TotalFuelPoints} / ${blueFuelGoal}`;
+      // 1. 計算紅藍兩隊的目標值
+      const redFuelGoal = getFuelGoal(data.Red.ScoreSummary);
+      const blueFuelGoal = getFuelGoal(data.Blue.ScoreSummary);
+
+      // 2. 使用樣板字面值 (Template Literals) 正確帶入變數
+      // 修正了你紅藍兩隊後綴不統一的問題（原本藍隊用 NumCoralLevelsGoal）
+      redCoral = `${data.Red.ScoreSummary.TotalFuelPoints}/${redFuelGoal}`;
+      blueCoral = `${data.Blue.ScoreSummary.TotalFuelPoints}/${blueFuelGoal}`;
   }
   $(`#${redSide}Coral`).text(redCoral);
   $(`#${redSide}Algae`).text(data.Red.ScoreSummary.TotalTowerPoints);
@@ -891,10 +906,14 @@ $(function () {
   // Read the configuration for this display from the URL query string.
   const urlParams = new URLSearchParams(window.location.search);
   document.body.style.backgroundColor = urlParams.get("background");
-  // The official broadcast layout always uses blue on the left and red on the right.
-  const reversed = "true";
-  redSide = "right";
-  blueSide = "left";
+  const reversed = urlParams.get("reversed") ?? "true";
+  if (reversed === "true") {
+    redSide = "right";
+    blueSide = "left";
+  } else {
+    redSide = "left";
+    blueSide = "right";
+  }
   $(".reversible-left").attr("data-reversed", reversed);
   $(".reversible-right").attr("data-reversed", reversed);
   // This broadcast layout always places the match overlay at the top.
