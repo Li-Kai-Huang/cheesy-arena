@@ -909,12 +909,23 @@ $(function () {
   // Read the configuration for this display from the URL query string.
   const urlParams = new URLSearchParams(window.location.search);
   document.body.style.backgroundColor = urlParams.get("background");
-  // The official broadcast layout always uses blue on the left and red on the right.
-  const reversed = "true";
-  redSide = "right";
-  blueSide = "left";
+  const reversed = urlParams.get("reversed") ?? "true";
+  if (reversed === "true") {
+    redSide = "left";
+    blueSide = "right";
+  } else {
+    redSide = "right";
+    blueSide = "left";
+  }
+  $("body").attr("data-reversed", reversed);
   $(".reversible-left").attr("data-reversed", reversed);
   $(".reversible-right").attr("data-reversed", reversed);
+  const leftAllianceColor = reversed === "true" ? "red" : "blue";
+  const rightAllianceColor = reversed === "true" ? "blue" : "red";
+  $(".external-score-fields-left .coral-icon")
+    .attr("src", `/static/img/${leftAllianceColor}_Fuelgoal.png`);
+  $(".external-score-fields-right .coral-icon")
+    .attr("src", `/static/img/${rightAllianceColor}_Fuelgoal.png`);
   // This broadcast layout always places the match overlay at the top.
   overlayCenteringHideParams = overlayCenteringTopHideParams;
   overlayCenteringShowParams = overlayCenteringTopShowParams;

@@ -132,10 +132,10 @@ html {
   border-left: 1px solid #222;
 
 }
-.reversible-left[data-reversed=false], .reversible-right[data-reversed=true] {
+.reversible-left[data-reversed=true], .reversible-right[data-reversed=false] {
   background-color: #831e12;
 }
-.reversible-left[data-reversed=true], .reversible-right[data-reversed=false] {
+.reversible-left[data-reversed=false], .reversible-right[data-reversed=true] {
   background-color: #004172;
 }
 
@@ -178,6 +178,7 @@ html {
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 #bluenumber{
+  
     background-color:#2080ff;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 
@@ -384,8 +385,11 @@ html {
   background-position: center;
   background-size: 100%;
 }
-.blinds.background {
-  background-image: url("/static/img/background.001.jpeg");
+body[data-reversed="true"] .blinds.background {
+  background-image: url("/static/img/background_true.jpeg");
+}
+body[data-reversed="false"] .blinds.background {
+  background-image: url("/static/img/background_false.jpeg");
 }
 .blindsCenter {
   position: absolute;
@@ -469,19 +473,21 @@ html {
   z-index: 9999;
   background:transparent;
 }
-#leftFinalScore{
+/* Keep the Final Score colors synchronized with the display's reversed setting. */
+.final-score.reversible-left[data-reversed=true],
+.final-teams.reversible-left[data-reversed=true],
+.final-score.reversible-right[data-reversed=false],
+.final-teams.reversible-right[data-reversed=false] {
   background-color: red;
-  
 }
-#leftFinalteams{
-  background-color: red;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);}
-#rightFinalScore{
+
+.final-score.reversible-left[data-reversed=false],
+.final-teams.reversible-left[data-reversed=false],
+.final-score.reversible-right[data-reversed=true],
+.final-teams.reversible-right[data-reversed=true] {
   background-color: #2080ff;
 }
-#rightFinalteams{
-  background-color: #2080ff;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);}
+.final-teams { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
 #leftFinalScore {
   padding-right: 150px;
 }
@@ -1067,14 +1073,22 @@ html {
   line-height: 21px;
 }
 
+body[data-reversed="true"] #leftTeams,
+body[data-reversed="false"] #rightTeams {
+  background: #a90d18;
+}
+
+body[data-reversed="true"] #rightTeams,
+body[data-reversed="false"] #leftTeams {
+  background: #00689d;
+}
+
 #leftTeams {
   grid-column: 1;
-  background: #00689d;
 }
 
 #rightTeams {
   grid-column: 2;
-  background: #a90d18;
 }
 
 .team {
@@ -1115,14 +1129,24 @@ html {
   box-shadow: none;
 }
 
+/* reversed=true：左紅、右藍 */
+body[data-reversed="true"] #leftWrapper .score,
+body[data-reversed="false"] #rightWrapper .score {
+  background: #ed1c24 !important;
+}
+
+/* reversed=true：右藍；reversed=false：左藍 */
+body[data-reversed="true"] #rightWrapper .score,
+body[data-reversed="false"] #leftWrapper .score {
+  background: #129bd3 !important;
+}
+
 #leftWrapper .score {
   grid-column: 2;
-  background: #129bd3 !important;
 }
 
 #rightWrapper .score {
   grid-column: 1;
-  background: #ed1c24 !important;
 }
 
 .score .score-number {
@@ -1258,12 +1282,20 @@ body[data-match-state="POST_MATCH"] .coopertition {
 
 .external-score-fields-left {
   right: calc(100% + 80px);
-  background: #087fbd;
 }
 
 .external-score-fields-right {
   left: calc(100% + 80px);
+}
+
+body[data-reversed="true"] .external-score-fields-left,
+body[data-reversed="false"] .external-score-fields-right {
   background: #ed1c24;
+}
+
+body[data-reversed="false"] .external-score-fields-left,
+body[data-reversed="true"] .external-score-fields-right {
+  background: #087fbd;
 }
 
 .external-score-fields .score-field > div {
