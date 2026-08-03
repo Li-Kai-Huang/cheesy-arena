@@ -158,7 +158,8 @@ const handleMatchTime = function (data) {
   // Place the active-Hub arrow on the physical side where that alliance is displayed.
   const setHubActive = function (side, active) {
     const element = $(`#${side}_Hubactive`);
-    if (!active || data.MatchState === 6) {
+    const matchInProgress = [3, 4, 5].includes(data.MatchState);
+    if (!matchInProgress || !active) {
       element.empty();
       return;
     }
