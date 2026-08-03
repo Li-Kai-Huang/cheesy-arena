@@ -194,11 +194,11 @@ func generateInMatchTeamRearText(arena *Arena, isRed bool, countdown string) str
 	if isRed {
 		realtimeScore = arena.RedRealtimeScore
 		opponentRealtimeScore = arena.BlueRealtimeScore
-		formatString = "R%03d-B%03d\n"
+		formatString = "\n R%03d-B%03d"
 	} else {
 		realtimeScore = arena.BlueRealtimeScore
 		opponentRealtimeScore = arena.RedRealtimeScore
-		formatString = "B%03d-R%03d\n"
+		formatString = "\n B%03d-R%03d"
 	}
 	scoreSummary := realtimeScore.CurrentScore.Summarize(&opponentRealtimeScore.CurrentScore)
 	scoreTotal := scoreSummary.Score // Removed BargePoints logic
