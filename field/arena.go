@@ -866,9 +866,9 @@ func (arena *Arena) updateGameSpecificMessage() {
 	// Rule: Send "B" if Red won Auto (meaning Blue has advantage/active first)
 	// Rule: Send "R" if Blue won Auto (meaning Red has advantage/active first)
 
-	msg := "R" // Default: Blue Won -> Red gets Active first ("R")
+	msg := "B" // Default: Blue Won -> Red gets Active first ("R")
 	if arena.redWonAutoFuel() {
-		msg = "B" // Red Won -> Blue gets Active first ("B")
+		msg = "R" // Red Won -> Blue gets Active first ("B")
 	}
 
 	// This message is static for the duration of Teleop based on Auto results.

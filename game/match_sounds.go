@@ -61,11 +61,11 @@ func UpdateMatchSounds() {
 			"wav",
 			float64(MatchTiming.AutoDurationSec + MatchTiming.PauseDurationSec + MatchTiming.TeleopDurationSec),
 		},
-		{
-			"abort",
-			"wav",
-			-1,
-		},
+		//{
+		//	"abort",
+		//	"wav",
+		//	-1,
+		//},
 		{
 			"match_result",
 			"wav",
