@@ -77,40 +77,39 @@ type TbaHubScore struct {
 
 // 2026 REBUILT Score Breakdown Structure
 type TbaScoreBreakdown struct {
+	AdjustPoints int `mapstructure:"adjustPoints"`
+
 	// Auto
 	AutoTowerRobot1 string `mapstructure:"autoTowerRobot1"`
 	AutoTowerRobot2 string `mapstructure:"autoTowerRobot2"`
 	AutoTowerRobot3 string `mapstructure:"autoTowerRobot3"`
-	AutoFuelPoints  int    `mapstructure:"autoFuelPoints"`
 	AutoTowerPoints int    `mapstructure:"autoTowerPoints"`
-	AutoPoints      int    `mapstructure:"autoPoints"`
+	TotalAutoPoints int    `mapstructure:"totalAutoPoints"`
 
 	// Teleop
-	TeleopFuelPoints int `mapstructure:"teleopFuelPoints"`
-	TeleopPoints     int `mapstructure:"teleopPoints"`
+	TotalTeleopPoints int `mapstructure:"totalTeleopPoints"`
 
 	// Endgame
-	EndGameRobot1      string `mapstructure:"endGameRobot1"`
-	EndGameRobot2      string `mapstructure:"endGameRobot2"`
-	EndGameRobot3      string `mapstructure:"endGameRobot3"`
+	EndGameTowerRobot1 string `mapstructure:"endGameTowerRobot1"`
+	EndGameTowerRobot2 string `mapstructure:"endGameTowerRobot2"`
+	EndGameTowerRobot3 string `mapstructure:"endGameTowerRobot3"`
 	EndGameTowerPoints int    `mapstructure:"endGameTowerPoints"`
 
 	// Totals
-	TotalFuelPoints  int `mapstructure:"totalFuelPoints"`
 	TotalTowerPoints int `mapstructure:"totalTowerPoints"`
 	TotalPoints      int `mapstructure:"totalPoints"`
 
 	// Fouls
-	FoulCount     int  `mapstructure:"foulCount"`
-	TechFoulCount int  `mapstructure:"techFoulCount"`
-	G206Penalty   bool `mapstructure:"g206Penalty"` // RP Collusion
-	FoulPoints    int  `mapstructure:"foulPoints"`
+	MinorFoulCount int  `mapstructure:"minorFoulCount"`
+	MajorFoulCount int  `mapstructure:"majorFoulCount"`
+	G206Penalty    bool `mapstructure:"g206Penalty"` // RP Collusion
+	FoulPoints     int  `mapstructure:"foulPoints"`
 
-	// Ranking Points
-	EnergizedRankingPoint    bool `mapstructure:"energizedRankingPoint"`
-	SuperchargedRankingPoint bool `mapstructure:"superchargedRankingPoint"`
-	TraversalRankingPoint    bool `mapstructure:"traversalRankingPoint"`
-	RP                       int  `mapstructure:"rp"`
+	// Ranking Points & Achievements
+	EnergizedAchieved    bool `mapstructure:"energizedAchieved"`
+	SuperchargedAchieved bool `mapstructure:"superchargedAchieved"`
+	TraversalAchieved    bool `mapstructure:"traversalAchieved"`
+	RP                   int  `mapstructure:"rp"`
 
 	// 2026 Hub Score Object
 	HubScore TbaHubScore `mapstructure:"hubScore"`
@@ -641,27 +640,26 @@ func createTbaScoringBreakdown(
 
 	// 2026 REBUILT Fields Mapping
 
+	// Adjust
+	breakdown.AdjustPoints = 0
+
 	// Auto
 	breakdown.AutoTowerRobot1 = autoTowerMapping[score.AutoTowerLevel1[0]]
 	breakdown.AutoTowerRobot2 = autoTowerMapping[score.AutoTowerLevel1[1]]
 	breakdown.AutoTowerRobot3 = autoTowerMapping[score.AutoTowerLevel1[2]]
-	breakdown.AutoFuelPoints = scoreSummary.AutoFuelPoints
 	breakdown.AutoTowerPoints = scoreSummary.AutoTowerPoints
-	breakdown.AutoPoints = scoreSummary.AutoPoints
+	breakdown.TotalAutoPoints = scoreSummary.AutoPoints
 
 	// Teleop
-	breakdown.TeleopFuelPoints = scoreSummary.TeleopFuelPoints
-	// TeleopPoints usually includes endgame in TBA logic, but let's keep it clean
-	breakdown.TeleopPoints = scoreSummary.MatchPoints - scoreSummary.AutoPoints
+	breakdown.TotalTeleopPoints = scoreSummary.MatchPoints - scoreSummary.AutoPoints
 
 	// Endgame
-	breakdown.EndGameRobot1 = endGameStatusMapping[score.EndgameStatuses[0]]
-	breakdown.EndGameRobot2 = endGameStatusMapping[score.EndgameStatuses[1]]
-	breakdown.EndGameRobot3 = endGameStatusMapping[score.EndgameStatuses[2]]
+	breakdown.EndGameTowerRobot1 = endGameStatusMapping[score.EndgameStatuses[0]]
+	breakdown.EndGameTowerRobot2 = endGameStatusMapping[score.EndgameStatuses[1]]
+	breakdown.EndGameTowerRobot3 = endGameStatusMapping[score.EndgameStatuses[2]]
 	breakdown.EndGameTowerPoints = scoreSummary.EndgameTowerPoints
 
 	// Totals
-	breakdown.TotalFuelPoints = scoreSummary.TotalFuelPoints
 	breakdown.TotalTowerPoints = scoreSummary.TotalTowerPoints
 	breakdown.TotalPoints = scoreSummary.Score
 
@@ -688,9 +686,9 @@ func createTbaScoringBreakdown(
 	// Fouls
 	for _, foul := range score.Fouls {
 		if foul.IsMajor {
-			breakdown.TechFoulCount++
+			breakdown.MajorFoulCount++
 		} else if foul.PointValue() > 0 {
-			breakdown.FoulCount++
+			breakdown.MinorFoulCount++
 		}
 		if foul.Rule() != nil && foul.Rule().RuleNumber == "G206" {
 			breakdown.G206Penalty = true
@@ -698,14 +696,13 @@ func createTbaScoringBreakdown(
 	}
 	breakdown.FoulPoints = scoreSummary.FoulPoints
 
-	// Ranking Points
+	// Ranking Points & Achievements
 	if match.ShouldUpdateRankings() {
-		breakdown.EnergizedRankingPoint = scoreSummary.EnergizedRankingPoint
-		breakdown.SuperchargedRankingPoint = scoreSummary.SuperchargedRankingPoint
-		breakdown.TraversalRankingPoint = scoreSummary.TraversalRankingPoint
+		breakdown.EnergizedAchieved = scoreSummary.EnergizedRankingPoint
+		breakdown.SuperchargedAchieved = scoreSummary.SuperchargedRankingPoint
+		breakdown.TraversalAchieved = scoreSummary.TraversalRankingPoint
 		breakdown.RP = scoreSummary.BonusRankingPoints
 
-		// 修正點 2: 使用 match.Status 判斷勝負
 		if match.Status == game.RedWonMatch && alliance == "red" {
 			breakdown.RP += 3
 		} else if match.Status == game.BlueWonMatch && alliance == "blue" {
