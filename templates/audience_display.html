@@ -263,7 +263,36 @@
         </div>
       </div>
       <div id="bracket">
-        <img id="bracketSvg" src="" />
+        <div class="audience-bracket-slide audience-bracket-slide-tree is-active">
+          <div class="audience-bracket-rounds" aria-hidden="true">
+            <span>Round 1</span>
+            <span>Round 2</span>
+            <span>Round 3</span>
+            <span>Round 4</span>
+            <span>Round 5</span>
+          </div>
+          <div class="audience-bracket-tree">
+            <img id="bracketSvg" src="" alt="Playoff bracket" />
+          </div>
+          <div class="audience-bracket-footer">
+            <div class="audience-bracket-footer-title">Playoff Bracket presented by</div>
+            <div class="audience-bracket-footer-sponsor">
+              <img src="/static/img/lower-third-logo.png" alt="Event sponsor" />
+            </div>
+          </div>
+        </div>
+        <div class="audience-bracket-slide audience-bracket-slide-alliances">
+          <div id="bracketAllianceGrid" class="bracket-alliance-grid"></div>
+          <div class="bracket-alliance-footer">
+            <div class="bracket-alliance-event">
+              <strong>{{.EventSettings.Name}}</strong>
+              <span>Playoff Alliances</span>
+            </div>
+            <div class="bracket-alliance-brand">
+              <img src="/static/img/frc_rebuilt.png" alt="REEFSCAPE" />
+            </div>
+          </div>
+        </div>
       </div>
       <div id="sponsor" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner" id="sponsorContainer">

@@ -650,19 +650,235 @@ body[data-reversed="false"] .blinds.background {
 #finalMatchName {
   text-align: right;
 }
+
+/* Official-style Audience Display playoff bracket. */
 #bracket {
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto auto;
+  inset: 0;
+  overflow: hidden;
   z-index: 1;
   opacity: 0;
-  text-align: center;
+  background-color: #f7e7c4;
+  background-image: url("/static/img/alliance_selection_background.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #1f1f1f;
+  font-family: "Outfit", "FuturaLT", sans-serif;
 }
+
+.audience-bracket-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(28px);
+  transition: opacity 650ms ease, transform 650ms ease, visibility 650ms;
+  pointer-events: none;
+}
+
+.audience-bracket-slide.is-active {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.audience-bracket-rounds {
+  position: absolute;
+  top: 10px;
+  left: 3.2%;
+  right: 18.5%;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  pointer-events: none;
+}
+
+.audience-bracket-rounds span {
+  font-size: clamp(22px, 2vw, 38px);
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.audience-bracket-tree {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
 #bracketSvg {
-  width: 1920px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  max-width: none;
+  height: auto;
+  clip-path: none;
+  filter: drop-shadow(0 5px 6px rgba(62, 43, 20, 0.16));
+}
+
+.audience-bracket-footer {
+  position: absolute;
+  right: 1.2%;
+  bottom: 18px;
+  z-index: 4;
+  width: min(44vw, 850px);
+  height: 88px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(220px, 1fr);
+  box-shadow: 0 5px 13px rgba(55, 39, 17, 0.26);
+}
+
+.audience-bracket-footer-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background: #edb52d;
+  color: #171717;
+  font-size: clamp(18px, 1.45vw, 28px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.audience-bracket-footer-sponsor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 22px;
+  background: #fff;
+}
+
+.audience-bracket-footer-sponsor img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bracket-alliance-grid {
+  position: absolute;
+  top: 3.2%;
+  left: 14.5%;
+  right: 14.5%;
+  bottom: 26%;
+  display: grid;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.bracket-alliance-row {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 33% 67%;
+  box-shadow: 0 4px 10px rgba(55, 39, 17, 0.18);
+}
+
+.bracket-alliance-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #edb52d;
+  color: #171717;
+  font-size: clamp(22px, 2.2vw, 43px);
+  font-weight: 500;
+}
+
+.bracket-alliance-teams {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #dedede;
+}
+
+.bracket-alliance-team {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  color: #242424;
+  font-size: clamp(16px, 1.45vw, 28px);
+  font-weight: 700;
+}
+
+.bracket-alliance-team img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.bracket-alliance-team-empty span {
+  display: none;
+}
+
+.bracket-alliance-team-empty img {
+  opacity: 0.9;
+}
+
+.bracket-alliance-footer {
+  position: absolute;
+  right: 5%;
+  bottom: 2.2%;
+  left: 5%;
+  height: 16%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 29%;
+  background: #fff;
+  box-shadow: 0 5px 13px rgba(55, 39, 17, 0.23);
+}
+
+.bracket-alliance-event {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 5%;
+  color: #202020;
+}
+
+.bracket-alliance-event::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 27%;
+  z-index: 0;
+  background: #edb52d;
+}
+
+.bracket-alliance-event strong,
+.bracket-alliance-event span {
+  position: relative;
+  z-index: 1;
+}
+
+.bracket-alliance-event strong {
+  font-size: clamp(22px, 2.1vw, 40px);
+}
+
+.bracket-alliance-event span {
+  font-size: clamp(17px, 1.35vw, 26px);
+}
+
+.bracket-alliance-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 28px;
+}
+
+.bracket-alliance-brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 #sponsor {
   position: fixed;

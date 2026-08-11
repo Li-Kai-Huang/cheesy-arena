@@ -14,6 +14,8 @@ let blueSide;
 let currentMatch;
 let overlayCenteringHideParams;
 let overlayCenteringShowParams;
+let bracketCarouselTimer = null;
+let bracketCarouselIndex = 0;
 const allianceSelectionTemplate = Handlebars.compile($("#allianceSelectionTemplate").html());
 const sponsorImageTemplate = Handlebars.compile($("#sponsorImageTemplate").html());
 const sponsorTextTemplate = Handlebars.compile($("#sponsorTextTemplate").html());
@@ -50,11 +52,44 @@ let matchData = null;
 
 // Handles a websocket message to change which screen is displayed.
 const handleAudienceDisplayMode = function (targetScreen) {
+  if (targetScreen === "bracket") {
+    startBracketCarousel();
+  } else {
+    stopBracketCarousel();
+  }
   // Coalesce repeated notifier messages while a transition is already running.
   if (transitionQueue[transitionQueue.length - 1] !== targetScreen) {
     transitionQueue.push(targetScreen);
   }
   executeTransitionQueue();
+};
+
+const showBracketCarouselSlide = function (index) {
+  const slides = $("#bracket .audience-bracket-slide");
+  if (slides.length === 0) {
+    return;
+  }
+  bracketCarouselIndex = index % slides.length;
+  slides.removeClass("is-active").attr("aria-hidden", "true");
+  slides.eq(bracketCarouselIndex).addClass("is-active").attr("aria-hidden", "false");
+};
+
+const startBracketCarousel = function () {
+  if (bracketCarouselTimer !== null) {
+    clearInterval(bracketCarouselTimer);
+  }
+  showBracketCarouselSlide(0);
+  bracketCarouselTimer = setInterval(function () {
+    showBracketCarouselSlide(bracketCarouselIndex + 1);
+  }, 9000);
+};
+
+const stopBracketCarousel = function () {
+  if (bracketCarouselTimer !== null) {
+    clearInterval(bracketCarouselTimer);
+    bracketCarouselTimer = null;
+  }
+  showBracketCarouselSlide(0);
 };
 
 // Sequentially executes all transitions in the queue. Returns without doing anything if another invocation is already
@@ -358,7 +393,10 @@ const handleScorePosted = function (data) {
   $("#finalMatchName").html(matchName);
 
   // Reload the bracket to reflect any changes.
-  $("#bracketSvg").attr("src", "/api/bracket/svg?activeMatch=saved&v=" + new Date().getTime());
+  $("#bracketSvg").attr(
+    "src",
+    "/api/bracket/svg?style=audience&activeMatch=saved&v=" + new Date().getTime(),
+  );
 
   if (data.Match.Type === matchTypePlayoff) {
     // Hide bonus ranking points and show playoff-only fields.
@@ -390,6 +428,30 @@ const handleAllianceSelection = function (data) {
       v.Index = k + 1;
     });
     $("#allianceSelection").html(allianceSelectionTemplate({ alliances: alliances, numColumns: numColumns }));
+
+    let bracketAllianceHtml = "";
+    for (let i = 0; i < 8; i++) {
+      const teamIds = alliances[i] ? alliances[i].TeamIds.slice(0, 3) : [];
+      while (teamIds.length < 3) {
+        teamIds.push(0);
+      }
+      const teamCells = teamIds.map(function (teamId) {
+        if (teamId > 0) {
+          return `<div class="bracket-alliance-team">` +
+            `<img src="${getAvatarUrl(teamId)}" alt="Team ${teamId}">` +
+            `<span>${teamId}</span>` +
+            `</div>`;
+        }
+        return `<div class="bracket-alliance-team bracket-alliance-team-empty">` +
+          `<img src="/static/img/lower-third-logo.png" alt="Team pending">` +
+          `</div>`;
+      }).join("");
+      bracketAllianceHtml += `<div class="bracket-alliance-row">` +
+        `<div class="bracket-alliance-label">Alliance ${i + 1}</div>` +
+        `<div class="bracket-alliance-teams">${teamCells}</div>` +
+        `</div>`;
+    }
+    $("#bracketAllianceGrid").html(bracketAllianceHtml);
   }
   if (rankedTeams) {
     // Count remaining captain slots

@@ -245,13 +245,26 @@ func (web *Web) bracketSvgApiHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "image/svg+xml")
 	w.Header().Add("Access-Control-Allow-Origin", "*")
-	if err := web.generateBracketSvg(w, activeMatch); err != nil {
+	templateFile := "templates/bracket.svg"
+	templateName := "bracket"
+	if r.URL.Query().Get("style") == "audience" &&
+		web.arena.EventSettings.PlayoffType == model.DoubleEliminationPlayoff {
+		templateFile = "templates/audience_bracket.svg"
+		templateName = "audience_bracket"
+	}
+	if err := web.generateBracketSvgFromTemplate(w, activeMatch, templateFile, templateName); err != nil {
 		handleWebErr(w, err)
 		return
 	}
 }
 
 func (web *Web) generateBracketSvg(w io.Writer, activeMatch *model.Match) error {
+	return web.generateBracketSvgFromTemplate(w, activeMatch, "templates/bracket.svg", "bracket")
+}
+
+func (web *Web) generateBracketSvgFromTemplate(
+	w io.Writer, activeMatch *model.Match, templateFile, templateName string,
+) error {
 	alliances, err := web.arena.Database.GetAllAlliances()
 	if err != nil {
 		return err
@@ -306,7 +319,7 @@ func (web *Web) generateBracketSvg(w io.Writer, activeMatch *model.Match) error 
 		}
 	}
 
-	template, err := web.parseFiles("templates/bracket.svg")
+	template, err := web.parseFiles(templateFile)
 	if err != nil {
 		return err
 	}
@@ -314,5 +327,5 @@ func (web *Web) generateBracketSvg(w io.Writer, activeMatch *model.Match) error 
 		BracketType string
 		Matchups    map[string]*allianceMatchup
 	}{bracketType, matchups}
-	return template.ExecuteTemplate(w, "bracket", data)
+	return template.ExecuteTemplate(w, templateName, data)
 }
