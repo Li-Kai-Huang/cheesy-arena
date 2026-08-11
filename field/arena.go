@@ -94,6 +94,7 @@ type Arena struct {
 	PlayoffTournament                 *playoff.PlayoffTournament
 	LowerThird                        *model.LowerThird
 	ShowLowerThird                    bool
+	ShowLowerThirdTeam                bool
 	MuteMatchSounds                   bool
 	matchAborted                      bool
 	soundsPlayed                      map[*game.MatchSound]struct{}
