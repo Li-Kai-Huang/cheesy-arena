@@ -139,9 +139,10 @@ func (arena *Arena) generateEventStatusMessage() any {
 
 func (arena *Arena) generateLowerThirdMessage() any {
 	return &struct {
-		LowerThird     *model.LowerThird
-		ShowLowerThird bool
-	}{arena.LowerThird, arena.ShowLowerThird}
+		LowerThird         *model.LowerThird
+		ShowLowerThird     bool
+		ShowLowerThirdTeam bool
+	}{arena.LowerThird, arena.ShowLowerThird, arena.ShowLowerThirdTeam}
 }
 
 func (arena *Arena) GenerateMatchLoadMessage() any {
