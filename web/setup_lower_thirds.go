@@ -105,6 +105,17 @@ func (web *Web) lowerThirdsWebsocketHandler(w http.ResponseWriter, r *http.Reque
 			web.saveLowerThird(&lowerThird)
 			web.arena.LowerThird = &lowerThird
 			web.arena.ShowLowerThird = true
+			web.arena.ShowLowerThirdTeam = false // 一開始只顯示獎名，隊伍資訊列重置為隱藏
+			web.arena.LowerThirdNotifier.Notify()
+			continue
+		case "revealLowerThirdTeam":
+			// 在獎名已經顯示的狀態下，額外把得獎隊伍資訊列打開。
+			web.arena.ShowLowerThirdTeam = true
+			web.arena.LowerThirdNotifier.Notify()
+			continue
+		case "hideLowerThirdTeam":
+			// 只把隊伍資訊列收起來，獎名列維持顯示。
+			web.arena.ShowLowerThirdTeam = false
 			web.arena.LowerThirdNotifier.Notify()
 			continue
 		case "hideLowerThird":
@@ -116,6 +127,7 @@ func (web *Web) lowerThirdsWebsocketHandler(w http.ResponseWriter, r *http.Reque
 			}
 			web.saveLowerThird(&lowerThird)
 			web.arena.ShowLowerThird = false
+			web.arena.ShowLowerThirdTeam = false // 一併重置，下次 Show 時從只有獎名開始
 			web.arena.LowerThirdNotifier.Notify()
 			continue
 		case "reorderLowerThird":
