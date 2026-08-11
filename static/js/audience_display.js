@@ -134,6 +134,7 @@ const executeTransitionQueue = function () {
 // Handles a websocket message to update the teams for the current match.
 const handleMatchLoad = function (data) {
   currentMatch = data.Match;
+  $("body").attr("data-playoff", currentMatch.Type === matchTypePlayoff ? "true" : "false");
   $(`#${redSide}Team1`).text(currentMatch.Red1);
   $(`#${redSide}Team1`).attr("data-yellow-card", data.Teams["R1"]?.YellowCard);
   $(`#${redSide}Team2`).text(currentMatch.Red2);
@@ -570,7 +571,12 @@ const transitionBlankToIntro = function (callback) {
   $(".teams").css({ display: "flex", opacity: 1 });
   $(".avatars").css({ display: "flex", opacity: 1 });
   $("#left_Hubactive, #right_Hubactive").hide();
-  $(".score-number, #matchTime, .score-fields").css("opacity", 0);
+  if (currentMatch?.Type === matchTypePlayoff) {
+    $(".score-fields").css({ display: "flex", opacity: 1 });
+    $(".score-number, #matchTime").css("opacity", 1);
+  } else {
+    $(".score-number, #matchTime, .score-fields").css("opacity", 0);
+  }
   $("#eventMatchInfo").css({ display: "grid", height: eventMatchInfoDown });
   $("#overlayCentering")
     .css({ top: overlayCenteringTopUp, opacity: 0 })
@@ -702,9 +708,11 @@ const transitionIntroToBlank = function (callback) {
 
 const transitionIntroToMatch = function (callback) {
   $("#left_Hubactive, #right_Hubactive").show().css("opacity", 1);
-  $(".avatars").transition({ queue: false, opacity: 0 }, 250, "ease", function () {
-    $(this).hide();
-  });
+  if (currentMatch?.Type !== matchTypePlayoff) {
+    $(".avatars").transition({ queue: false, opacity: 0 }, 250, "ease", function () {
+      $(this).hide();
+    });
+  }
   $(".score-fields").css("display", "flex");
   $("#broadcastFooter").css({ display: "flex", opacity: 0 });
   $("#broadcastFooter").transition({ queue: false, opacity: 1 }, 300, "ease");
@@ -825,16 +833,21 @@ const transitionMatchToIntro = function (callback) {
   $("#broadcastFooter").transition({ queue: false, opacity: 0 }, 250, "ease", function () {
     $(this).hide().css("opacity", 1);
   });
-  $(".score-number, #matchTime, .score-fields").transition(
-    { queue: false, opacity: 0 },
-    280,
-    "ease",
-    function () {
-      $(".score-fields").hide();
-      $(".avatars").css({ display: "flex", opacity: 0 });
-      $(".avatars").transition({ queue: false, opacity: 1 }, 280, "ease");
-    },
-  );
+  if (currentMatch?.Type === matchTypePlayoff) {
+    $(".score-number, #matchTime, .score-fields").css("opacity", 1);
+    $(".score-fields").css("display", "flex");
+  } else {
+    $(".score-number, #matchTime, .score-fields").transition(
+      { queue: false, opacity: 0 },
+      280,
+      "ease",
+      function () {
+        $(".score-fields").hide();
+        $(".avatars").css({ display: "flex", opacity: 0 });
+        $(".avatars").transition({ queue: false, opacity: 1 }, 280, "ease");
+      },
+    );
+  }
   setTimeout(callback, 300);
 };
 
