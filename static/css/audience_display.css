@@ -963,7 +963,7 @@ body[data-reversed="false"] .blinds.background {
   object-fit: contain;
 }
 
-.lt-title-box {
+.lt-title-text {
   flex: 1;
   padding-left: 20px;
   font-size: 28px;
@@ -974,11 +974,11 @@ body[data-reversed="false"] .blinds.background {
   text-overflow: ellipsis;
 }
 
-/* --- 下層：金黃色隊伍詳細資訊列 (條目二，可開關) --- */
+/* --- 下層：可開關) --- */
 .lt-bottom-row {
   display: flex;
   height: 80px;
-  background-color: #eab308; /* FRC 經典金黃色 */
+  background-color: #eab308; /* 金黃色 */
   color: #000000;
   border-top: 2px solid #ca8a04;
 }
@@ -1023,32 +1023,6 @@ body[data-reversed="false"] .blinds.background {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-#lowerThirdLogo {
-  margin: 12px 20px;
-  height: 60px;
-  float: left;
-}
-#lowerThirdTop {
-  position: relative;
-  top: 10px;
-  display: none;
-  font-family: 'Arboto Bold', sans-serif;
-  font-weight: 700;  /* bold */
-}
-#lowerThirdBottom {
-  display: none;
-  font-family: 'Arboto Bold', sans-serif;
-  font-weight: 700;  /* bold */
-  font-size: 23px;
-  position: relative;
-  top: 5px;
-}
-#lowerThirdSingle {
-  display: none;
-  font-family: 'Arboto Bold', sans-serif;
-  font-weight: 700;  /* bold */
-  line-height: 87px;
 }
 
 /* Consolidated official-style Match Play layout. */
