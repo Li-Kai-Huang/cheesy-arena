@@ -437,20 +437,36 @@ const handleAllianceSelection = function (data) {
 // Handles a websocket message to populate and/or show/hide a lower third.
 const handleLowerThird = function (data) {
   if (data.LowerThird !== null) {
-    if (data.LowerThird.BottomText === "") {
-      $("#lowerThirdTop").hide();
-      $("#lowerThirdBottom").hide();
-      $("#lowerThirdSingle").text(data.LowerThird.TopText);
-      $("#lowerThirdSingle").show();
-    } else {
-      $("#lowerThirdSingle").hide();
-      $("#lowerThirdTop").text(data.LowerThird.TopText);
-      $("#lowerThirdBottom").text(data.LowerThird.BottomText);
-      $("#lowerThirdTop").show();
+    
+    $("#lowerThirdSingle").hide();
+
+    $("#lowerThirdTitle").text(data.LowerThird.TopText);
+    $("#lowerThirdTop").show();
+
+    
+    const bottomText = data.LowerThird.BottomText ? data.LowerThird.BottomText.trim() : "";
+
+    if (bottomText !== "") {
+      
+      if (bottomText.includes("|")) {
+        const parts = bottomText.split("|");
+        $("#lowerThirdTeamNumber").text(parts[0].trim());
+        $("#lowerThirdTeamName").text(parts[1].trim());
+      } else {
+        // 沒有 '|' 符號時，清空隊號，直接將文字顯示在隊名欄位
+        $("#lowerThirdTeamNumber").text("");
+        $("#lowerThirdTeamName").text(bottomText);
+      }
+      
+      // 顯示第二條
       $("#lowerThirdBottom").show();
+    } else {
+      // BottomText 為空時，隱藏第二條
+      $("#lowerThirdBottom").hide();
     }
   }
 
+  // 3. 左側滑入/滑出動畫邏輯
   const lowerThirdElement = $("#lowerThird");
   if (data.ShowLowerThird && !lowerThirdElement.is(":visible")) {
     lowerThirdElement.show();
@@ -461,7 +477,6 @@ const handleLowerThird = function (data) {
     });
   }
 };
-
 const transitionAllianceSelectionToBlank = function (callback) {
   $('#allianceSelectionBackground').hide();
   $('#allianceSelectionCentering').transition({ queue: false, right: "-60em" }, 500, "ease", callback);
