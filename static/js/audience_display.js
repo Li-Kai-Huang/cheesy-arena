@@ -446,7 +446,7 @@ const handleLowerThird = function (data) {
     
     const bottomText = data.LowerThird.BottomText ? data.LowerThird.BottomText.trim() : "";
 
-    if (bottomText !== "") {
+    if (bottomText !== "" && data.ShowLowerThirdTeam) {
       
       if (bottomText.includes("|")) {
         const parts = bottomText.split("|");
@@ -461,7 +461,7 @@ const handleLowerThird = function (data) {
       // 顯示第二條
       $("#lowerThirdBottom").show();
     } else {
-      // BottomText 為空時，隱藏第二條
+      // BottomText 為空、或還沒按下「顯示得獎隊伍」時，隱藏第二條
       $("#lowerThirdBottom").hide();
     }
   }
