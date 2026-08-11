@@ -879,8 +879,8 @@ body[data-reversed="false"] .blinds.background {
 }
 #sponsor {
   position: fixed;
-  width: 1000px;
-  height: 600px;
+  width: 1280px;
+  height: 780px;
   top: 0;
   bottom: 0;
   left: 0;
@@ -896,8 +896,8 @@ body[data-reversed="false"] .blinds.background {
   height: 100%;
 }
 .sponsor-image-container {
-  width: 1000px;
-  height: 500px;
+  width: 1080px;
+  height: 720px;
   display: table-cell;
   vertical-align: middle;
 }
@@ -923,8 +923,9 @@ body[data-reversed="false"] .blinds.background {
   line-height: 110px;
 }
 #sponsor img {
-  max-width: 800px;
-  max-height: 400px;
+  max-width: 1280px;
+  max-height: 800px;
+  top:0px;
 }
 #allianceSelectionBackground {
   position: fixed;
