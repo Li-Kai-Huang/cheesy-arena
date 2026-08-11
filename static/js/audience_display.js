@@ -445,6 +445,7 @@ const handleLowerThird = function (data) {
 
     
     const bottomText = data.LowerThird.BottomText ? data.LowerThird.BottomText.trim() : "";
+    const lowerThirdBottomElement = $("#lowerThirdBottom");
 
     if (bottomText !== "" && data.ShowLowerThirdTeam) {
       
@@ -458,11 +459,15 @@ const handleLowerThird = function (data) {
         $("#lowerThirdTeamName").text(bottomText);
       }
       
-      // 顯示第二條
-      $("#lowerThirdBottom").show();
+      // 滑出第二條（如果目前是隱藏的才觸發，避免重複播放動畫）
+      if (!lowerThirdBottomElement.is(":visible")) {
+        lowerThirdBottomElement.slideDown(400);
+      }
     } else {
-      // BottomText 為空、或還沒按下「顯示得獎隊伍」時，隱藏第二條
-      $("#lowerThirdBottom").hide();
+      // BottomText 為空、或還沒按下「顯示得獎隊伍」時，滑入收起第二條
+      if (lowerThirdBottomElement.is(":visible")) {
+        lowerThirdBottomElement.slideUp(400);
+      }
     }
   }
 
